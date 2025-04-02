@@ -22,6 +22,9 @@ repositories {
 dependencies {
     implementation(libs.clikt)
     implementation(libs.itextpdf.core)
+    implementation(libs.kotlin.coroutines)
+    implementation(libs.apache.poi.common)
+    implementation(libs.apache.poi.ooxml)
 }
 
 testing {
@@ -44,4 +47,16 @@ java {
 application {
     // Define the main class for the application.
     mainClass = "de.lschnartzke.fscramble.AppKt"
+}
+
+val fatJar = task("fatJar", type = Jar::class) {
+    archiveFileName = "${project.name}.jar"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes["Implementation-Title"] = "Gradle Jar File Example"
+        attributes["Implementation-Version"] = version
+        attributes["Main-Class"] = "de.lschnartzke.fscramble.AppKt"
+    }
+    from(configurations.runtimeClasspath.get().map({ if (it.isDirectory) it else zipTree(it) }))
+    with(tasks.jar.get() as CopySpec)
 }
