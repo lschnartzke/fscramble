@@ -1,8 +1,10 @@
 package de.lschnartzke.fscramble.scramblers
 
 import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfPage
 import com.itextpdf.kernel.pdf.PdfReader
 import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.element.Paragraph
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -45,20 +47,36 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
         }
     }
 
+    /**
+     * Add a new (empty) page somewhere in the document
+     */
     private fun scrambleAddPage(doc: PdfDocument) {
-
+        val newPageIndex = rng.nextInt() % doc.numberOfPages
+        doc.addNewPage(newPageIndex)
     }
 
     private fun scrambleRemovePage(doc: PdfDocument) {
+        if (doc.numberOfPages == 0)
+            return
 
+        val pageIndex = rng.nextInt() % doc.numberOfPages
+        doc.removePage(pageIndex)
     }
 
     private fun scrambleAddText(doc: PdfDocument) {
-
+        // TODO: Grab text from a txt file instead of random letters?
     }
 
+    /**
+     * Go to a random page, pick random paragraph(s) and remove them.
+     * TODO: What if the page does not contain paragraphs? New page or just ignore?
+     */
     private fun scrambleRemoveText(doc: PdfDocument) {
+        if (doc.numberOfPages == 0)
+            return
 
+        val pageIndex = rng.nextInt() % doc.numberOfPages
+        val page = doc.getPage(pageIndex)
     }
 
     private fun scrambleAddMedia(doc: PdfDocument) {
