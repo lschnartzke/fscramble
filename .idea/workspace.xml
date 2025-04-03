@@ -6,6 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="158bdd98-25f9-4d5f-a5e1-813a94133acf" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/AbstractScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/AbstractScrambler.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/PdfScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/PdfScrambler.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -51,7 +53,8 @@
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "git-widget-placeholder": "master",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/home/leon/Prog/Uni/fscramble"
+    "last_opened_file_path": "/home/leon/Prog/Uni/fscramble",
+    "settings.editor.selected.configurable": "preferences.pluginManager"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

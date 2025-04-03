@@ -21,15 +21,21 @@ import kotlin.random.Random
  */
 abstract class AbstractScrambler(val dataDirectory: String) {
     enum class ScrambleAction {
-        ADD_PAGE,
-        REMOVE_PAGE,
         ADD_TEXT,
         REMOVE_TEXT,
         ADD_MEDIA,
         REMOVE_MEDIA
     }
-    val actions = ScrambleAction.entries.toTypedArray()
+    private val actions = ScrambleAction.entries.toTypedArray()
     val rng: Random = Random(System.currentTimeMillis()) // good enough
+
+    /**
+     * Initialize the scrambler. This function will be called only once per instance. Its purpose is to initialize the
+     * scrambler and cache the data it may use during scrambling (e.g. preloading images and text).
+     *
+     * The function may assume that only one thread is using and does not require internal locks
+     */
+    abstract suspend fun init()
 
     /**
      * Scramble the provided file.

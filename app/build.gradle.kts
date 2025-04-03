@@ -49,7 +49,7 @@ application {
     mainClass = "de.lschnartzke.fscramble.AppKt"
 }
 
-val fatJar = task("fatJar", type = Jar::class) {
+val fatJar = tasks.register("fatJar", type = Jar::class) {
     archiveFileName = "${project.name}.jar"
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
