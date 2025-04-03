@@ -1,20 +1,23 @@
 package de.lschnartzke.fscramble.scramblers
 
+import com.itextpdf.io.font.FontNames
 import com.itextpdf.io.image.ImageData
 import com.itextpdf.io.image.ImageDataFactory
+import com.itextpdf.kernel.font.PdfFont
+import com.itextpdf.kernel.font.PdfFontFactory
+import com.itextpdf.kernel.font.PdfTrueTypeFont
 import com.itextpdf.kernel.geom.Rectangle
+import com.itextpdf.kernel.pdf.*
 import com.itextpdf.layout.Document
-import com.itextpdf.kernel.pdf.PdfDocument
-import com.itextpdf.kernel.pdf.PdfPage
-import com.itextpdf.kernel.pdf.PdfReader
-import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas
 import com.itextpdf.layout.Canvas
+import com.itextpdf.layout.element.Image
 import com.itextpdf.layout.element.Paragraph
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
+import kotlin.math.absoluteValue
 
 /**
  * Class responsible for scrambling PDF files.
@@ -83,8 +86,6 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
                 else -> {} // nothing to do
             }
         }
-
-
     }
 
     override suspend fun scramble(input: String, output: String, scrambleCount: Int) = withContext(Dispatchers.IO) {
@@ -102,6 +103,8 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
                 ScrambleAction.REMOVE_MEDIA -> scrambleRemoveMedia(pdfDoc)
             }
         }
+
+        pdfDoc.close()
     }
 
     /**
@@ -110,7 +113,7 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
     private fun getRandomPage(doc: Document): PdfPage? {
         if (doc.pdfDocument.numberOfPages == 0) return null
 
-        val pageIndex = rng.nextInt() % doc.pdfDocument.numberOfPages
+        val pageIndex = rng.nextInt(until = doc.pdfDocument.numberOfPages)
         return doc.pdfDocument.getPage(pageIndex)
     }
 
@@ -130,49 +133,53 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
      * Add a new (empty) page somewhere in the document
      */
     private fun scrambleAddPage(doc: Document): PdfPage {
-        val newPageIndex = rng.nextInt() % doc.pdfDocument.numberOfPages
+        val newPageIndex = rng.nextInt(until = doc.pdfDocument.numberOfPages).absoluteValue
         return doc.pdfDocument.addNewPage(newPageIndex)
     }
 
     private fun scrambleRemovePage(doc: Document) {
+        println("remove page")
+
         if (doc.pdfDocument.numberOfPages == 0)
             return
 
-        val pageIndex = rng.nextInt() % doc.pdfDocument.numberOfPages
+        val pageIndex = rng.nextInt(until = doc.pdfDocument.numberOfPages)
         doc.pdfDocument.removePage(pageIndex)
     }
 
     private fun scrambleAddText(doc: Document) {
+        println("add text")
         val page = scrambleAddPage(doc)
         val text = getRandomParagraph()
 
-        val canvas = PdfCanvas(page)
-        canvas.beginText()
-        canvas.showText(text)
-        canvas.endText()
+        val canvas = Canvas(PdfCanvas(page), doc.getPageEffectiveArea(doc.pdfDocument.defaultPageSize))
+        canvas.pdfCanvas.apply {
+            beginText()
+            setFontAndSize(doc.pdfDocument.defaultFont, 12f)
+            showText(text)
+            endText()
+        }
+        canvas.close()
     }
 
 
     private fun scrambleAddMedia(doc: Document) {
+        println("add media")
+        if (imageData.isEmpty())
+            return // nothing to do
         val page = scrambleAddPage(doc)
         val pdfCanvas = PdfCanvas(page)
         val canvas = Canvas(pdfCanvas, doc.getPageEffectiveArea(doc.pdfDocument.defaultPageSize))
 
         val data = imageData[rng.nextInt(until = imageData.size)]
-
-        canvas.add(imageData[rng.nextInt(until = imageData.size)])
-        canvas.add
-
-
+        val image = Image(data)
+        canvas.add(image)
+        canvas.close()
     }
 
     private fun scrambleRemoveMedia(doc: Document) {
-
+        // TODO: Maybe we just remove another page?
+        println("remove media")
     }
 
-    private fun withRandomPage(doc: Document, fn: (PdfPage) -> Unit) {
-        val page = getRandomPage(doc) ?: return
-
-        fn(page)
-    }
 }

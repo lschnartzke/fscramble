@@ -50,6 +50,6 @@ abstract class AbstractScrambler(val dataDirectory: String) {
      * the file being scrambled.
      */
     protected fun getScrambleAction(): ScrambleAction {
-        return actions[rng.nextInt() % actions.size]
+        return actions[rng.nextInt(until = actions.size)]
     }
 }
