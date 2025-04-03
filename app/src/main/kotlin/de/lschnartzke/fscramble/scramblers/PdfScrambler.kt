@@ -2,12 +2,14 @@ package de.lschnartzke.fscramble.scramblers
 
 import com.itextpdf.io.image.ImageData
 import com.itextpdf.io.image.ImageDataFactory
+import com.itextpdf.kernel.geom.Rectangle
 import com.itextpdf.layout.Document
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfPage
 import com.itextpdf.kernel.pdf.PdfReader
 import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas
+import com.itextpdf.layout.Canvas
 import com.itextpdf.layout.element.Paragraph
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -37,7 +39,7 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
      */
     private fun pdfWriter(ifile: String, ofile: String): PdfWriter {
         val outfile = File(ofile)
-        val writer: PdfWriter =  if (outfile.isDirectory) {
+        val writer: PdfWriter = if (outfile.isDirectory) {
             PdfWriter(File(ofile, ifile))
         } else {
             PdfWriter(ofile)
@@ -83,7 +85,6 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
         }
 
 
-
     }
 
     override suspend fun scramble(input: String, output: String, scrambleCount: Int) = withContext(Dispatchers.IO) {
@@ -94,7 +95,7 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
 
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            when(action) {
+            when (action) {
                 ScrambleAction.ADD_TEXT -> scrambleAddText(pdfDoc)
                 ScrambleAction.REMOVE_TEXT -> scrambleRemovePage(pdfDoc) // Believe it or not, this is what removing text looks like
                 ScrambleAction.ADD_MEDIA -> scrambleAddMedia(pdfDoc)
@@ -153,7 +154,15 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
 
 
     private fun scrambleAddMedia(doc: Document) {
-        
+        val page = scrambleAddPage(doc)
+        val pdfCanvas = PdfCanvas(page)
+        val canvas = Canvas(pdfCanvas, doc.getPageEffectiveArea(doc.pdfDocument.defaultPageSize))
+
+        val data = imageData[rng.nextInt(until = imageData.size)]
+
+        canvas.add(imageData[rng.nextInt(until = imageData.size)])
+        canvas.add
+
 
     }
 
