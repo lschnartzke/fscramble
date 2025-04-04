@@ -1,5 +1,9 @@
 package de.lschnartzke.fscramble.scramblers
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileInputStream
 import kotlin.random.Random
 
 /**
@@ -29,6 +33,8 @@ abstract class AbstractScrambler(val dataDirectory: String) {
     private val actions = ScrambleAction.entries.toTypedArray()
     val rng: Random = Random(System.currentTimeMillis()) // good enough
 
+    protected val textParagraphs: MutableList<String> = mutableListOf()
+
     /**
      * Initialize the scrambler. This function will be called only once per instance. Its purpose is to initialize the
      * scrambler and cache the data it may use during scrambling (e.g. preloading images and text).
@@ -37,6 +43,31 @@ abstract class AbstractScrambler(val dataDirectory: String) {
      */
     abstract suspend fun init()
 
+    protected fun getOutfile(input: String, output: String): File {
+        val ofile = File(output)
+
+        return if (ofile.isDirectory) {
+            File(ofile, input)
+        } else {
+            ofile
+        }
+    }
+
+    protected suspend fun loadTextFile(file: File) = withContext(Dispatchers.IO) {
+        val reader = FileInputStream(file).bufferedReader()
+        val builder = StringBuilder()
+        for (line in reader.readLines()) {
+            if (line.isEmpty() && builder.isNotEmpty()) {
+                textParagraphs.add(builder.toString())
+                builder.clear()
+                continue
+            } else if (line.isEmpty()) {
+                continue
+            }
+
+            builder.append(line)
+        }
+    }
     /**
      * Scramble the provided file.
      * @param input - the file to scramble. Must always point to a file

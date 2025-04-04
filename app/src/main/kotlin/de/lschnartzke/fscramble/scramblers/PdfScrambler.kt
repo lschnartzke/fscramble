@@ -27,9 +27,6 @@ import kotlin.math.absoluteValue
  * Afterward the file is written back, replacing the original file (unless specified otherwise)
  */
 class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
-    // List of text paragraphs (can be multiple lines) that may be used during ADD_TEXT scrambling
-    val textParagraphs: MutableList<String> = mutableListOf()
-
     // List of images that may be inserted into the pdf
     val imageData: MutableList<ImageData> = mutableListOf()
 
@@ -51,21 +48,6 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
         return writer
     }
 
-    private suspend fun loadTextFile(file: File) = withContext(Dispatchers.IO) {
-        val reader = FileInputStream(file).bufferedReader()
-        val builder = StringBuilder()
-        for (line in reader.readLines()) {
-            if (line.isEmpty() && builder.isNotEmpty()) {
-                textParagraphs.add(builder.toString())
-                builder.clear()
-                continue
-            } else if (line.isEmpty()) {
-                continue
-            }
-
-            builder.append(line)
-        }
-    }
 
     private suspend fun loadImageFile(file: File) = withContext(Dispatchers.IO) {
         val data = ImageDataFactory.create(file.path)
@@ -181,5 +163,4 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
         // TODO: Maybe we just remove another page?
         println("remove media")
     }
-
 }
