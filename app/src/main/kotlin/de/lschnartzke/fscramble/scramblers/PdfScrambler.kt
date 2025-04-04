@@ -68,7 +68,7 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
     }
 
     private suspend fun loadImageFile(file: File) = withContext(Dispatchers.IO) {
-        val data = ImageDataFactory.create(file.name)
+        val data = ImageDataFactory.create(file.path)
         imageData.add(data)
     }
 
