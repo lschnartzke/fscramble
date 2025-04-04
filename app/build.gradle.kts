@@ -26,6 +26,7 @@ dependencies {
     implementation(libs.apache.poi.common)
     implementation(libs.apache.poi.ooxml)
     implementation(libs.odftoolkit)
+    implementation(libs.klogging)
 }
 
 testing {

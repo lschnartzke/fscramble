@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import de.lschnartzke.fscramble.scramblers.PdfScrambler
+import io.klogging.log
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -35,6 +36,7 @@ class App : CliktCommand() {
     }
 }
 
-fun main(args: Array<String>) {
+fun main(args: Array<String>) = runBlocking {
+
     App().main(args)
 }

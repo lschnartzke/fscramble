@@ -18,7 +18,7 @@ class OfficeScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) 
         val files = dataDir.listFiles() ?: return
 
         for (file in files) {
-            when (file.) {
+            when (file.extension) {
                 "txt" -> loadTextFile(file)
                 "png", "jpeg", "jpg", "tiff", "gif", "svg" -> loadImageFile(file)
                 else -> {} // nothing to do (yet)
