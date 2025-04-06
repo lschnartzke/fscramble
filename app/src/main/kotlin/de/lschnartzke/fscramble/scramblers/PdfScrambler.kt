@@ -13,6 +13,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas
 import com.itextpdf.layout.Canvas
 import com.itextpdf.layout.element.Image
 import com.itextpdf.layout.element.Paragraph
+import io.klogging.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -29,6 +30,7 @@ import kotlin.math.absoluteValue
 class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
     // List of images that may be inserted into the pdf
     val imageData: MutableList<ImageData> = mutableListOf()
+    private val logger =  logger<PdfScrambler>()
 
     /**
      * Determine where to write the resulting PDF file

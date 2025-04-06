@@ -5,11 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="158bdd98-25f9-4d5f-a5e1-813a94133acf" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/cache/DataCache.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/App.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/App.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/OfficeScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/OfficeScrambler.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/PdfScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/PdfScrambler.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

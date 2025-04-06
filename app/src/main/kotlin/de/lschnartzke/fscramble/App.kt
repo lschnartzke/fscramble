@@ -5,7 +5,9 @@ import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import de.lschnartzke.fscramble.scramblers.PdfScrambler
-import io.klogging.log
+import io.klogging.config.ANSI_CONSOLE
+import io.klogging.config.loggingConfiguration
+import io.klogging.logger
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -37,6 +39,10 @@ class App : CliktCommand() {
 }
 
 fun main(args: Array<String>) = runBlocking {
+    loggingConfiguration {
+        ANSI_CONSOLE()
+    }
 
+    logger("main").info("Starting up...")
     App().main(args)
 }
