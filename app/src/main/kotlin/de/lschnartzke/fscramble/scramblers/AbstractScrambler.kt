@@ -23,7 +23,7 @@ import kotlin.random.Random
  *   so, for example, to provide data specifically to be used for PdfScrambler:
  *   `dataDirectory/pdf/{file}
  */
-abstract class AbstractScrambler(val dataDirectory: String) {
+abstract class AbstractScrambler() {
     enum class ScrambleAction {
         ADD_TEXT,
         REMOVE_TEXT,
@@ -32,16 +32,6 @@ abstract class AbstractScrambler(val dataDirectory: String) {
     }
     private val actions = ScrambleAction.entries.toTypedArray()
     val rng: Random = Random(System.currentTimeMillis()) // good enough
-
-    protected val textParagraphs: MutableList<String> = mutableListOf()
-
-    /**
-     * Initialize the scrambler. This function will be called only once per instance. Its purpose is to initialize the
-     * scrambler and cache the data it may use during scrambling (e.g. preloading images and text).
-     *
-     * The function may assume that only one thread is using and does not require internal locks
-     */
-    abstract suspend fun init()
 
     protected fun getOutfile(input: String, output: String): File {
         val ofile = File(output)
@@ -53,21 +43,6 @@ abstract class AbstractScrambler(val dataDirectory: String) {
         }
     }
 
-    protected suspend fun loadTextFile(file: File) = withContext(Dispatchers.IO) {
-        val reader = FileInputStream(file).bufferedReader()
-        val builder = StringBuilder()
-        for (line in reader.readLines()) {
-            if (line.isEmpty() && builder.isNotEmpty()) {
-                textParagraphs.add(builder.toString())
-                builder.clear()
-                continue
-            } else if (line.isEmpty()) {
-                continue
-            }
-
-            builder.append(line)
-        }
-    }
     /**
      * Scramble the provided file.
      * @param input - the file to scramble. Must always point to a file

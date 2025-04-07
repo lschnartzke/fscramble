@@ -13,6 +13,7 @@ import com.itextpdf.kernel.pdf.canvas.PdfCanvas
 import com.itextpdf.layout.Canvas
 import com.itextpdf.layout.element.Image
 import com.itextpdf.layout.element.Paragraph
+import de.lschnartzke.fscramble.cache.DataCache
 import io.klogging.logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -27,9 +28,8 @@ import kotlin.math.absoluteValue
  * This means that text will be added or removed, pictures might be inserted and the layout may be changed.
  * Afterward the file is written back, replacing the original file (unless specified otherwise)
  */
-class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
+class PdfScrambler() : AbstractScrambler() {
     // List of images that may be inserted into the pdf
-    val imageData: MutableList<ImageData> = mutableListOf()
     private val logger =  logger<PdfScrambler>()
 
     /**
@@ -50,28 +50,6 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
         return writer
     }
 
-
-    private suspend fun loadImageFile(file: File) = withContext(Dispatchers.IO) {
-        val data = ImageDataFactory.create(file.path)
-        imageData.add(data)
-    }
-
-    override suspend fun init() {
-        val pdfDataDirectory = File(dataDirectory, "pdf")
-        if (!pdfDataDirectory.isDirectory) {
-            return
-        }
-
-        val files = pdfDataDirectory.listFiles() ?: return
-        for (file in files) {
-            when (file.extension) {
-                "txt" -> loadTextFile(file)
-                "png", "gif", "jpg", "jpeg", "bmp", "svg" -> loadImageFile(file)
-                else -> {} // nothing to do
-            }
-        }
-    }
-
     override suspend fun scramble(input: String, output: String, scrambleCount: Int) = withContext(Dispatchers.IO) {
         val reader = PdfReader(input)
         val writer = pdfWriter(input, output)
@@ -80,6 +58,7 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
 
         repeat(scrambleCount) {
             val action = getScrambleAction()
+            logger.info("action" to action.toString())
             when (action) {
                 ScrambleAction.ADD_TEXT -> scrambleAddText(pdfDoc)
                 ScrambleAction.REMOVE_TEXT -> scrambleRemovePage(pdfDoc) // Believe it or not, this is what removing text looks like
@@ -104,14 +83,7 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
     /**
      * Return either a random paragraph from `textParagraphs` or, if that's empty, a randomly generated string
      */
-    private fun getRandomParagraph(): String =
-        if (textParagraphs.isEmpty()) {
-            // TODO: Generate random string
-            ""
-        } else {
-            textParagraphs[rng.nextInt(until = textParagraphs.size)]
-        }
-
+    private fun getRandomParagraph(): String = DataCache.getDataCache().getRandomParagraph()
 
     /**
      * Add a new (empty) page somewhere in the document
@@ -122,8 +94,6 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
     }
 
     private fun scrambleRemovePage(doc: Document) {
-        println("remove page")
-
         if (doc.pdfDocument.numberOfPages == 0)
             return
 
@@ -132,7 +102,6 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
     }
 
     private fun scrambleAddText(doc: Document) {
-        println("add text")
         val page = scrambleAddPage(doc)
         val text = getRandomParagraph()
 
@@ -148,14 +117,12 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
 
 
     private fun scrambleAddMedia(doc: Document) {
-        println("add media")
-        if (imageData.isEmpty())
-            return // nothing to do
+        val imageBytes = DataCache.getDataCache().getRandomImageData()?.content ?: return
         val page = scrambleAddPage(doc)
         val pdfCanvas = PdfCanvas(page)
         val canvas = Canvas(pdfCanvas, doc.getPageEffectiveArea(doc.pdfDocument.defaultPageSize))
 
-        val data = imageData[rng.nextInt(until = imageData.size)]
+        val data = ImageDataFactory.create(imageBytes)
         val image = Image(data)
         canvas.add(image)
         canvas.close()
@@ -163,6 +130,5 @@ class PdfScrambler(dataDirectory: String) : AbstractScrambler(dataDirectory) {
 
     private fun scrambleRemoveMedia(doc: Document) {
         // TODO: Maybe we just remove another page?
-        println("remove media")
     }
 }

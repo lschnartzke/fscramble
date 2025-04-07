@@ -4,6 +4,7 @@ import io.klogging.logger
 import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.io.InputStreamReader
+import kotlin.random.Random
 import kotlin.system.exitProcess
 
 /**
@@ -77,7 +78,10 @@ class DataCache private constructor() {
 
     private suspend fun loadImageFile(file: File) {
         logger.info("Loading image file", "file" to file.path)
+        val bytes = file.readBytes()
 
+        val data = ImageData(file, bytes)
+        imageData.add(data)
     }
 
     private suspend fun init(dataDirectory: String) {
@@ -90,8 +94,25 @@ class DataCache private constructor() {
 
         val files = dir.listFiles() ?: return
         for (file in files) {
+            when (file.extension) {
+                "txt" -> loadTextFile(file)
+                "png", "jpeg", "jpg", "gif" -> loadImageFile(file)
+            }
+        }
+    }
 
+    fun getRandomImageData(): ImageData? {
+        if (imageData.isEmpty())
+            return null
+
+        return imageData[Random(System.nanoTime()).nextInt(until = imageData.size)]
+    }
+
+    fun getRandomParagraph(): String {
+        if (textData.isEmpty()) {
+            return "" // TODO: Return randomly generated string
         }
 
+        return textData[Random(System.nanoTime()).nextInt(until = textData.size)]
     }
 }
