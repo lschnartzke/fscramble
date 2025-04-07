@@ -6,6 +6,7 @@ import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import de.lschnartzke.fscramble.cache.DataCache
 import de.lschnartzke.fscramble.scramblers.OdfScrambler
+import de.lschnartzke.fscramble.scramblers.OdsScrambler
 import de.lschnartzke.fscramble.scramblers.PdfScrambler
 import io.klogging.config.ANSI_CONSOLE
 import io.klogging.config.loggingConfiguration
@@ -35,7 +36,8 @@ class App : CliktCommand() {
     private fun runSingleFile() {
         val scramblers = mapOf(
             "pdf" to PdfScrambler(),
-            "odt" to OdfScrambler()
+            "odt" to OdfScrambler(),
+            "ods" to OdsScrambler(),
         )
         runBlocking {
             val ifile = File(input[0])

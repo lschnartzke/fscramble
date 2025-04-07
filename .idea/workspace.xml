@@ -5,15 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="158bdd98-25f9-4d5f-a5e1-813a94133acf" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/OdsScrambler.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/DocxScrambler.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/App.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/App.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/cache/DataCache.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/cache/DataCache.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/AbstractScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/AbstractScrambler.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/OdfScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/OdfScrambler.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/OfficeScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/OfficeScrambler.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/PdfScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/PdfScrambler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/OdsScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/OdsScrambler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/OfficeScrambler.kt" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -94,6 +91,9 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.itextpdf/kernel/9.1.0/2ed9a840ea0e3e412f6017c7c2769262c27e9d98/kernel-9.1.0-sources.jar!/com/itextpdf/kernel/font/PdfTrueTypeFont.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.odftoolkit/odfdom-java/0.12.0/82a648a6add203006e608c871598d2ba1ca571e6/odfdom-java-0.12.0-sources.jar!/org/odftoolkit/odfdom/doc/OdfDocument.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.odftoolkit/odfdom-java/0.12.0/82a648a6add203006e608c871598d2ba1ca571e6/odfdom-java-0.12.0-sources.jar!/org/odftoolkit/odfdom/incubator/doc/draw/OdfDrawImage.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.odftoolkit/odfdom-java/0.12.0/82a648a6add203006e608c871598d2ba1ca571e6/odfdom-java-0.12.0-sources.jar!/org/odftoolkit/odfdom/pkg/OdfPackage.java" root0="SKIP_INSPECTION" />
   </component>
   <component name="ProjectCodeStyleSettingsMigration">
     <option name="version" value="2" />

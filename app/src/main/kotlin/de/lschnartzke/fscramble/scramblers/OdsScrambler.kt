@@ -1,5 +1,6 @@
 package de.lschnartzke.fscramble.scramblers
 
+import de.lschnartzke.fscramble.cache.DataCache
 import io.klogging.logger
 import org.odftoolkit.odfdom.doc.OdfDocument
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument
@@ -39,19 +40,25 @@ class OdsScrambler : AbstractScrambler() {
     }
 
     private suspend fun scrambleAddText(doc: OdfSpreadsheetDocument) {
+        val cell = getRandomCell(doc) ?: return
 
-
+        cell.displayText = DataCache.getDataCache().getRandomParagraph()
     }
 
     private suspend fun scrambleRemoveText(doc: OdfSpreadsheetDocument) {
-
+        val cell = getRandomCell(doc) ?: return
+        cell.displayText = ""
     }
 
     private suspend fun scrambleAddMedia(doc: OdfSpreadsheetDocument) {
+        val imageData = DataCache.getDataCache().getRandomImageData() ?: return
+        val cell = getRandomCell(doc) ?: return
+        val mediaUri = doc.newImage(imageData.file.toURI())
 
+        cell.stringValue = mediaUri
     }
 
     private suspend fun scrambleRemoveMedia(doc: OdfSpreadsheetDocument) {
-
+        // TODO: How?
     }
 }
