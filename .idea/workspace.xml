@@ -5,11 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="158bdd98-25f9-4d5f-a5e1-813a94133acf" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/XlsxScrambler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/App.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/App.kt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/cache/DataCache.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/cache/DataCache.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/DocxScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/DocxScrambler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/AbstractScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/AbstractScrambler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/PdfScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/PdfScrambler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/PlaintextScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/PlaintextScrambler.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/XlsxScrambler.kt" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/kotlin/de/lschnartzke/fscramble/scramblers/XlsxScrambler.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,6 +93,11 @@
   </component>
   <component name="HighlightingSettingsPerFile">
     <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.itextpdf/kernel/9.1.0/2ed9a840ea0e3e412f6017c7c2769262c27e9d98/kernel-9.1.0-sources.jar!/com/itextpdf/kernel/font/PdfTrueTypeFont.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.poi/poi-ooxml-lite/5.4.0/cac183d329e45d65a3d72b4b04460d0f221857e5/poi-ooxml-lite-5.4.0.jar!/org/openxmlformats/schemas/drawingml/x2006/spreadsheetDrawing/CTMarker.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.poi/poi-ooxml/5.4.0/f04c01c86b7db8ce44230ff73c4e275d4c4da04c/poi-ooxml-5.4.0-sources.jar!/org/apache/poi/xssf/usermodel/XSSFClientAnchor.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.poi/poi-ooxml/5.4.0/f04c01c86b7db8ce44230ff73c4e275d4c4da04c/poi-ooxml-5.4.0-sources.jar!/org/apache/poi/xssf/usermodel/XSSFCreationHelper.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.poi/poi-ooxml/5.4.0/f04c01c86b7db8ce44230ff73c4e275d4c4da04c/poi-ooxml-5.4.0-sources.jar!/org/apache/poi/xssf/usermodel/XSSFRow.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.apache.poi/poi-ooxml/5.4.0/f04c01c86b7db8ce44230ff73c4e275d4c4da04c/poi-ooxml-5.4.0-sources.jar!/org/apache/poi/xssf/usermodel/XSSFWorkbook.java" root0="SKIP_INSPECTION" />
     <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.odftoolkit/odfdom-java/0.12.0/82a648a6add203006e608c871598d2ba1ca571e6/odfdom-java-0.12.0-sources.jar!/org/odftoolkit/odfdom/doc/OdfDocument.java" root0="SKIP_INSPECTION" />
     <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.odftoolkit/odfdom-java/0.12.0/82a648a6add203006e608c871598d2ba1ca571e6/odfdom-java-0.12.0-sources.jar!/org/odftoolkit/odfdom/incubator/doc/draw/OdfDrawImage.java" root0="SKIP_INSPECTION" />
     <setting file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.odftoolkit/odfdom-java/0.12.0/82a648a6add203006e608c871598d2ba1ca571e6/odfdom-java-0.12.0-sources.jar!/org/odftoolkit/odfdom/pkg/OdfPackage.java" root0="SKIP_INSPECTION" />

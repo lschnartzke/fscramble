@@ -40,12 +40,8 @@ class PdfScrambler() : AbstractScrambler() {
      * write to `ofile/ifile`
      */
     private fun pdfWriter(ifile: String, ofile: String): PdfWriter {
-        val outfile = File(ofile)
-        val writer: PdfWriter = if (outfile.isDirectory) {
-            PdfWriter(File(ofile, ifile))
-        } else {
-            PdfWriter(ofile)
-        }
+        val outfile = getOutfile(ifile, ofile)
+        val writer = PdfWriter(outfile)
 
         return writer
     }
@@ -59,11 +55,15 @@ class PdfScrambler() : AbstractScrambler() {
         repeat(scrambleCount) {
             val action = getScrambleAction()
             logger.info("action" to action.toString())
-            when (action) {
-                ScrambleAction.ADD_TEXT -> scrambleAddText(pdfDoc)
-                ScrambleAction.REMOVE_TEXT -> scrambleRemovePage(pdfDoc) // Believe it or not, this is what removing text looks like
-                ScrambleAction.ADD_MEDIA -> scrambleAddMedia(pdfDoc)
-                ScrambleAction.REMOVE_MEDIA -> scrambleRemoveMedia(pdfDoc)
+            try {
+                when (action) {
+                    ScrambleAction.ADD_TEXT -> scrambleAddText(pdfDoc)
+                    ScrambleAction.REMOVE_TEXT -> scrambleRemovePage(pdfDoc) // Believe it or not, this is what removing text looks like
+                    ScrambleAction.ADD_MEDIA -> scrambleAddMedia(pdfDoc)
+                    ScrambleAction.REMOVE_MEDIA -> scrambleRemoveMedia(pdfDoc)
+                }
+            } catch (e: Exception) {
+                logger.error("Scramble action failed.", "error" to e, "action" to action.toString())
             }
         }
 
@@ -89,8 +89,16 @@ class PdfScrambler() : AbstractScrambler() {
      * Add a new (empty) page somewhere in the document
      */
     private fun scrambleAddPage(doc: Document): PdfPage {
-        val newPageIndex = rng.nextInt(until = doc.pdfDocument.numberOfPages).absoluteValue
-        return doc.pdfDocument.addNewPage(newPageIndex)
+        // if the document is empty, the random index causes OutOfBounds exceptions.
+        val page = if (doc.pdfDocument.numberOfPages <= 0) {
+            doc.pdfDocument.addNewPage()
+        } else {
+            val newPageIndex = rng.nextInt(until = doc.pdfDocument.numberOfPages)
+            println("pageIndex: ${newPageIndex}")
+            doc.pdfDocument.addNewPage(newPageIndex)
+        }
+
+        return page
     }
 
     private fun scrambleRemovePage(doc: Document) {

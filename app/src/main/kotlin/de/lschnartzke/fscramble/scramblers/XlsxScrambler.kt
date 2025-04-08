@@ -7,7 +7,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 
 class XlsxScrambler : AbstractScrambler() {
-    val logger = logger<XlsxScrambler>()
+    private val logger = logger<XlsxScrambler>()
 
     override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
         val outfile = getOutfile(input, output)
@@ -23,11 +23,24 @@ class XlsxScrambler : AbstractScrambler() {
                 ScrambleAction.REMOVE_MEDIA -> scrambleRemoveMedia(doc)
             }
         }
+
+        doc.write(outfile.outputStream())
+        doc.close()
     }
 
+    private var lastCreatedRowIndex = 0
+    private var lastCreatedColumnIndex = 0
     private fun getRandomCellFromSheet(sheet: XSSFSheet): XSSFCell {
-        val row = sheet.getRow(rng.nextInt(from = sheet.firstRowNum, until = sheet.lastRowNum))
-        val cell = row.getCell(rng.nextInt(from = row.firstCellNum.toInt(), until = row.lastCellNum.toInt()))
+        val row = if (sheet.firstRowNum <= 0 || sheet.lastRowNum <= 0) {
+            sheet.createRow(lastCreatedRowIndex++)
+        } else {
+            sheet.getRow(rng.nextInt(from = sheet.firstRowNum, until = sheet.lastRowNum))
+        }
+        val cell = if (row.firstCellNum <= 0 || row.lastCellNum <= 0) {
+            row.createCell(lastCreatedColumnIndex++)
+        } else  {
+            row.getCell(rng.nextInt(from = row.firstCellNum.toInt(), until = row.lastCellNum.toInt()))
+        }
         return cell
     }
 
@@ -54,14 +67,29 @@ class XlsxScrambler : AbstractScrambler() {
     }
 
     private suspend fun scrambleAddMedia(doc: XSSFWorkbook) {
-        // SAFETY: unless create == false this will never be null
+        val imageData = DataCache.getDataCache().getRandomImageData() ?: return
+        // Safety: Unless create == false this cannot be null
         val sheet = getOrCreateRandomSheet(doc)!!
-        val cell = getRandomCellFromSheet(sheet)
 
-        cell.
+        val pictureIndex = doc.addPicture(imageData.content, imageData.xlsxPictureType())
     }
 
     private suspend fun scrambleRemoveMedia(doc: XSSFWorkbook) {
+        if (doc.allPictures.isEmpty())
+            return
+
+        val pictureIndex = rng.nextInt(until = doc.allPictures.size)
+        val pictureData = doc.allPictures[pictureIndex]
+        val picturePart = pictureData.packagePart
+        logger.info("picturePartName" to picturePart.partName)
+
+        doc.allEmbeddedParts.remove(pictureData.packagePart)
+        pictureData.packagePart.clearRelationships()
+        doc.`package`.removePart(pictureData.packagePart)
+        doc.`package`.flush()
+
+        doc.allPictures.removeAt(pictureIndex)
+
 
     }
 }

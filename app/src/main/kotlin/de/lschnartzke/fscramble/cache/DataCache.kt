@@ -3,6 +3,7 @@ package de.lschnartzke.fscramble.cache
 import io.klogging.logger
 import kotlinx.coroutines.runBlocking
 import org.apache.poi.common.usermodel.PictureType
+import org.apache.poi.ss.usermodel.Workbook
 import java.io.File
 import java.io.InputStreamReader
 import kotlin.random.Random
@@ -48,6 +49,13 @@ class DataCache private constructor() {
                 "png" -> PictureType.PNG
                 "gif" -> PictureType.GIF
                 else -> PictureType.ERROR
+            }
+
+        fun xlsxPictureType(): Int =
+            when (file.extension) {
+                "jpeg", "jpg" -> Workbook.PICTURE_TYPE_JPEG
+                "png" -> Workbook.PICTURE_TYPE_PNG
+                else -> Workbook.PICTURE_TYPE_PICT // this will break stuff.
             }
 
     }

@@ -35,9 +35,10 @@ abstract class AbstractScrambler() {
 
     protected fun getOutfile(input: String, output: String): File {
         val ofile = File(output)
+        val ifile = File(input)
 
         return if (ofile.isDirectory) {
-            File(ofile, input)
+            File(ofile, ifile.name)
         } else {
             ofile
         }
