@@ -72,6 +72,8 @@ class XlsxScrambler : AbstractScrambler() {
         val sheet = getOrCreateRandomSheet(doc)!!
 
         val pictureIndex = doc.addPicture(imageData.content, imageData.xlsxPictureType())
+        val pictureData = doc.allPictures[pictureIndex]
+        logger.info("picturePartName" to pictureData.packagePart.partName)
     }
 
     private suspend fun scrambleRemoveMedia(doc: XSSFWorkbook) {
@@ -82,12 +84,7 @@ class XlsxScrambler : AbstractScrambler() {
         val pictureData = doc.allPictures[pictureIndex]
         val picturePart = pictureData.packagePart
         logger.info("picturePartName" to picturePart.partName)
-
-        doc.allEmbeddedParts.remove(pictureData.packagePart)
-        pictureData.packagePart.clearRelationships()
         doc.`package`.removePart(pictureData.packagePart)
-        doc.`package`.flush()
-
         doc.allPictures.removeAt(pictureIndex)
 
 

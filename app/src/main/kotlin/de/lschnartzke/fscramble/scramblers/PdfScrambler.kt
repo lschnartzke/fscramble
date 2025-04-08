@@ -63,7 +63,7 @@ class PdfScrambler() : AbstractScrambler() {
                     ScrambleAction.REMOVE_MEDIA -> scrambleRemoveMedia(pdfDoc)
                 }
             } catch (e: Exception) {
-                logger.error("Scramble action failed.", "error" to e, "action" to action.toString())
+                logger.error(mapOf("action" to action.toString(), "error" to e))
             }
         }
 
@@ -93,7 +93,9 @@ class PdfScrambler() : AbstractScrambler() {
         val page = if (doc.pdfDocument.numberOfPages <= 0) {
             doc.pdfDocument.addNewPage()
         } else {
-            val newPageIndex = rng.nextInt(until = doc.pdfDocument.numberOfPages)
+            // apparently this is lua now, as the pages are indexed at one and somewhere in the callstack is a
+            // --index to get the actual array index. Yay.
+            val newPageIndex = rng.nextInt(until = doc.pdfDocument.numberOfPages) + 1
             println("pageIndex: ${newPageIndex}")
             doc.pdfDocument.addNewPage(newPageIndex)
         }
@@ -105,7 +107,7 @@ class PdfScrambler() : AbstractScrambler() {
         if (doc.pdfDocument.numberOfPages == 0)
             return
 
-        val pageIndex = rng.nextInt(until = doc.pdfDocument.numberOfPages)
+        val pageIndex = rng.nextInt(until = doc.pdfDocument.numberOfPages + 1)
         doc.pdfDocument.removePage(pageIndex)
     }
 
