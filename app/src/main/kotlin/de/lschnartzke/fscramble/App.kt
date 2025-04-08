@@ -5,6 +5,7 @@ import com.github.ajalt.clikt.core.main
 import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import de.lschnartzke.fscramble.cache.DataCache
+import de.lschnartzke.fscramble.scramblers.DocxScrambler
 import de.lschnartzke.fscramble.scramblers.OdfScrambler
 import de.lschnartzke.fscramble.scramblers.OdsScrambler
 import de.lschnartzke.fscramble.scramblers.PdfScrambler
@@ -38,6 +39,7 @@ class App : CliktCommand() {
             "pdf" to PdfScrambler(),
             "odt" to OdfScrambler(),
             "ods" to OdsScrambler(),
+            "docx" to DocxScrambler()
         )
         runBlocking {
             val ifile = File(input[0])

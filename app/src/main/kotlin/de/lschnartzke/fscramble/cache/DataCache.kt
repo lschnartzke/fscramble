@@ -2,6 +2,7 @@ package de.lschnartzke.fscramble.cache
 
 import io.klogging.logger
 import kotlinx.coroutines.runBlocking
+import org.apache.poi.common.usermodel.PictureType
 import java.io.File
 import java.io.InputStreamReader
 import kotlin.random.Random
@@ -40,6 +41,15 @@ class DataCache private constructor() {
             result = 31 * result + content.contentHashCode()
             return result
         }
+
+        fun docxPictureType(): PictureType =
+            when (file.extension) {
+                "jpg", "jpeg" -> PictureType.JPEG
+                "png" -> PictureType.PNG
+                "gif" -> PictureType.GIF
+                else -> PictureType.ERROR
+            }
+
     }
 
     private val logger = logger<DataCache>()
