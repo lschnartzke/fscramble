@@ -80,22 +80,30 @@ class App : CliktCommand() {
 
     private suspend fun scrambleFile(input: String, output: String) {
         val ifile = File(input)
-        scramblers[ifile.extension]?.scramble(input, output, scrambleCount)
+        scramblers[ifile.extension]?.scramble(input, output, scrambleCount) ?: scramblers["txt"]!!.scramble(input, output, scrambleCount)
     }
 
-    private suspend fun scrambleDirectory(input: String, output: String) = runBlocking {
+    private suspend fun scrambleDirectory(input: String, output: String)  {
         val dir = File(input)
 
         val files = dir.listFiles()
         if (files == null) {
             logger.error("Failed to readdir", "dir" to dir.path)
-            return@runBlocking
+            return
         }
 
         val jobs: MutableList<Job> = mutableListOf()
         for (file in files) {
             val job = scope.launch(Dispatchers.IO) {
-                scrambleFile(file.absolutePath, output)
+                if (file.isDirectory){
+                    val outdir = File(output, file.name)
+                    if (!outdir.exists())
+                        outdir.mkdir()
+
+                    scrambleDirectory(file.absolutePath, outdir.absolutePath)
+                } else {
+                    scrambleFile(file.absolutePath, output)
+                }
             }
             jobs.add(job)
         }
