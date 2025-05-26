@@ -30,8 +30,12 @@ abstract class AbstractScrambler() {
         ADD_MEDIA,
         REMOVE_MEDIA
     }
-    private val actions = ScrambleAction.entries.toTypedArray()
+    private var actions = ScrambleAction.entries.toTypedArray()
     val rng: Random = Random(System.currentTimeMillis()) // good enough
+
+    fun overrideScrambleActions(vararg actions: ScrambleAction) {
+        this.actions = actions as Array<ScrambleAction>
+    }
 
     protected fun getOutfile(input: String, output: String): File {
         val ofile = File(output)

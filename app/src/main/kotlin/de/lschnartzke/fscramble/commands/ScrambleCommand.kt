@@ -17,7 +17,13 @@ class ScrambleCommand : CliktCommand() {
     val createMin: UInt by option().uint().default(0u).help { "Minimum amount of files to create (only applied if --create is present)" }
     val createMax: UInt by option().uint().default(0u).help { "Maximum amount of files to create (only applied if --create is present)" }
 
-    override fun run() = runBlocking {
+    fun validateArgs() {
+        if (create && (createMin > createMax)) {
+            throw IllegalArgumentException("--create-min must be smaller than --create-max")
+        }
+    }
 
+    override fun run()  {
+        validateArgs()
     }
 }
