@@ -5,6 +5,7 @@ import io.klogging.logger
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
+import java.io.File
 
 class XlsxScrambler : AbstractScrambler() {
     private val logger = logger<XlsxScrambler>()
@@ -13,6 +14,13 @@ class XlsxScrambler : AbstractScrambler() {
         val outfile = getOutfile(input, output)
         val doc = XSSFWorkbook(input)
 
+        doScramble(scrambleCount, doc)
+
+        doc.write(outfile.outputStream())
+        doc.close()
+    }
+
+    private suspend fun doScramble(scrambleCount: Int, doc: XSSFWorkbook) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
             logger.info("action" to action.toString())
@@ -23,9 +31,17 @@ class XlsxScrambler : AbstractScrambler() {
                 ScrambleAction.REMOVE_MEDIA -> scrambleRemoveMedia(doc)
             }
         }
+    }
+
+    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+        val outfile = getOutfile(filename, outpath)
+        val doc = XSSFWorkbook()
+
+        doScramble(scrambleCount, doc)
 
         doc.write(outfile.outputStream())
         doc.close()
+        return outfile
     }
 
     private var lastCreatedRowIndex = 0

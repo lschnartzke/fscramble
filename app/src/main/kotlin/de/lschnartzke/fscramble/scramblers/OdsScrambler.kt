@@ -5,14 +5,31 @@ import io.klogging.logger
 import org.odftoolkit.odfdom.doc.OdfDocument
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument
 import org.odftoolkit.odfdom.doc.table.OdfTableCell
+import java.io.File
 
 class OdsScrambler : AbstractScrambler() {
     private val logger = logger<OdsScrambler>()
+
+    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+        val outfile = getOutfile(filename, outpath)
+        val doc = OdfSpreadsheetDocument.newSpreadsheetDocument()
+
+        doScramble(scrambleCount, doc)
+
+        doc.save(outfile)
+        return outfile
+    }
 
     override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
         val outfile = getOutfile(input, output)
         val doc = OdfSpreadsheetDocument.loadDocument(input)
 
+        doScramble(scrambleCount, doc)
+
+        doc.save(outfile)
+    }
+
+    private suspend fun doScramble(scrambleCount: Int, doc: OdfSpreadsheetDocument) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
             logger.info("action" to action.toString())
@@ -23,8 +40,6 @@ class OdsScrambler : AbstractScrambler() {
                 ScrambleAction.REMOVE_MEDIA -> scrambleRemoveMedia(doc)
             }
         }
-
-        doc.save(outfile)
     }
 
     private suspend fun getRandomCell(doc: OdfSpreadsheetDocument): OdfTableCell? {

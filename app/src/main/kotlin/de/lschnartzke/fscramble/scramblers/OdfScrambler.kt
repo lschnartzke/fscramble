@@ -20,9 +20,25 @@ class OdfScrambler() : AbstractScrambler() {
         }
     }
 
+    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+        val outfile = getOutfile(filename, outpath)
+        val doc = OdfTextDocument.newTextDocument()
+
+        doScramble(scrambleCount, doc)
+
+        doc.save(outfile)
+        return outfile
+    }
+
     private suspend fun scrambleTextDocument(input: File, output: File, scrambleCount: Int) {
         val document = OdfTextDocument.loadDocument(input)
 
+        doScramble(scrambleCount, document)
+
+        document.save(output)
+    }
+
+    private suspend fun doScramble(scrambleCount: Int, document: OdfTextDocument) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
             logger.info("action" to action.toString())
@@ -33,8 +49,6 @@ class OdfScrambler() : AbstractScrambler() {
                 ScrambleAction.REMOVE_MEDIA -> scrambleRemoveMedia(document)
             }
         }
-
-        document.save(output)
     }
 
     private fun getRandomNode(parent: Node): OfficeTextElement {

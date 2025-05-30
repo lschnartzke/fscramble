@@ -2,8 +2,6 @@ package de.lschnartzke.fscramble.scramblers
 
 import de.lschnartzke.fscramble.cache.DataCache
 import io.klogging.logger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
 
 class PlaintextScrambler : AbstractScrambler() {
@@ -13,14 +11,7 @@ class PlaintextScrambler : AbstractScrambler() {
         val outfile = getOutfile(input, output)
         val fileLines = File(input).readLines().toMutableList()
 
-        repeat (scrambleCount) {
-            val action =getScrambleAction()
-            logger.info("action" to action.toString())
-            when (action) {
-                ScrambleAction.ADD_TEXT, ScrambleAction.ADD_MEDIA -> scrambleAddText(fileLines)
-                ScrambleAction.REMOVE_TEXT, ScrambleAction.REMOVE_MEDIA -> scrambleRemoveText(fileLines)
-            }
-        }
+        doScramble(scrambleCount, fileLines)
 
         val ostream = outfile.outputStream().bufferedWriter()
         fileLines.forEach {
@@ -30,6 +21,31 @@ class PlaintextScrambler : AbstractScrambler() {
         ostream.close()
     }
 
+    private suspend fun doScramble(scrambleCount: Int, fileLines: MutableList<String>) {
+        repeat(scrambleCount) {
+            val action = getScrambleAction()
+            logger.info("action" to action.toString())
+            when (action) {
+                ScrambleAction.ADD_TEXT, ScrambleAction.ADD_MEDIA -> scrambleAddText(fileLines)
+                ScrambleAction.REMOVE_TEXT, ScrambleAction.REMOVE_MEDIA -> scrambleRemoveText(fileLines)
+            }
+        }
+    }
+
+
+    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+        val outfile = getOutfile(filename, outpath)
+
+        val lines = mutableListOf<String>()
+        doScramble(scrambleCount, lines)
+
+        val stream = outfile.outputStream().bufferedWriter()
+        lines.forEach {
+            stream.write(it)
+        }
+
+        return outfile
+    }
 
     private suspend fun scrambleAddText(lines: MutableList<String>) {
         val line = DataCache.getDataCache().getRandomParagraph()

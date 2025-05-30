@@ -8,6 +8,7 @@ coroutines = "1.10.1"
 apache-poi = "5.4.0"
 odf = "0.12.0"
 klogging = "0.9.4"
+commons3 = "3.17.0"
 
 [libraries]
 clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt"}
@@ -15,6 +16,7 @@ itextpdf-core = { group = "com.itextpdf", name = "itext-core", version.ref = "it
 kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines"}
 apache-poi-common = { group = "org.apache.poi", name = "poi", version.ref  = "apache-poi"}
 apache-poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "apache-poi"}
+apache-commons-lang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commons3"}
 odftoolkit = { group = "org.odftoolkit", name = "odfdom-java", version.ref = "odf"}
 klogging = { group = "io.klogging", name = "klogging-jvm", version.ref = "klogging"}
 

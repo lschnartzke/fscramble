@@ -1,9 +1,6 @@
 package de.lschnartzke.fscramble.scramblers
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileInputStream
 import kotlin.random.Random
 
 /**
@@ -24,18 +21,41 @@ import kotlin.random.Random
  *   `dataDirectory/pdf/{file}
  */
 abstract class AbstractScrambler() {
+    companion object {
+        private var actions = ScrambleAction.entries.toTypedArray()
+        fun overrideScrambleActions(vararg actions: ScrambleAction) {
+            AbstractScrambler.actions = actions as Array<ScrambleAction>
+        }
+
+        val extensions = arrayOf("odt", "pdf", "ods", "docx", "xlsx", "txt")
+
+        fun randomExtension() = extensions.random()
+
+        val scramblerExtensionMap: HashMap<String, AbstractScrambler> = hashMapOf(
+            "odt" to OdfScrambler(),
+            "pdf" to PdfScrambler(),
+            "ods" to OdsScrambler(),
+            "docx" to DocxScrambler(),
+            "txt" to PlaintextScrambler(),
+            "xlsx" to XlsxScrambler(),
+        )
+    }
+
     enum class ScrambleAction {
         ADD_TEXT,
         REMOVE_TEXT,
         ADD_MEDIA,
         REMOVE_MEDIA
     }
-    private var actions = ScrambleAction.entries.toTypedArray()
+
     val rng: Random = Random(System.currentTimeMillis()) // good enough
 
-    fun overrideScrambleActions(vararg actions: ScrambleAction) {
-        this.actions = actions as Array<ScrambleAction>
-    }
+
+    /**
+     * Create a new file from scratch, filling it with random content from the data cache. SHOULD not perform delete
+     * operation (there is nothing to delete in a newly created file)
+     */
+    abstract suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int = 50): File
 
     protected fun getOutfile(input: String, output: String): File {
         val ofile = File(output)

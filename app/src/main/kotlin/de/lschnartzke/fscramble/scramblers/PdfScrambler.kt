@@ -46,12 +46,29 @@ class PdfScrambler() : AbstractScrambler() {
         return writer
     }
 
+    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+        val outfile = getOutfile(filename, outpath)
+        val writer = PdfWriter(outfile)
+        val doc = Document(PdfDocument(writer))
+
+        doScramble(scrambleCount, doc)
+
+        doc.close()
+        return outfile
+    }
+
     override suspend fun scramble(input: String, output: String, scrambleCount: Int) = withContext(Dispatchers.IO) {
         val reader = PdfReader(input)
         val writer = pdfWriter(input, output)
 
         val pdfDoc = Document(PdfDocument(reader, writer))
 
+        doScramble(scrambleCount, pdfDoc)
+
+        pdfDoc.close()
+    }
+
+    private suspend fun doScramble(scrambleCount: Int, pdfDoc: Document) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
             logger.info("action" to action.toString())
@@ -66,8 +83,6 @@ class PdfScrambler() : AbstractScrambler() {
                 logger.error(mapOf("action" to action.toString(), "error" to e))
             }
         }
-
-        pdfDoc.close()
     }
 
     /**

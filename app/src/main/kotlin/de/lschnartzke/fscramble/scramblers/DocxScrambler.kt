@@ -4,7 +4,6 @@ import de.lschnartzke.fscramble.cache.DataCache
 import io.klogging.logger
 import org.apache.poi.util.Units
 import org.apache.poi.xwpf.usermodel.XWPFDocument
-import org.odftoolkit.odfdom.type.Length
 import java.io.File
 
 class DocxScrambler : AbstractScrambler() {
@@ -15,6 +14,23 @@ class DocxScrambler : AbstractScrambler() {
         val istream = File(input).inputStream().buffered()
         val doc = XWPFDocument(istream)
 
+        doScramble(scrambleCount, doc)
+
+        doc.write(outfile.outputStream())
+        doc.close()
+    }
+
+    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+        val outfile = getOutfile(filename, outpath)
+        val doc = XWPFDocument()
+
+        doScramble(scrambleCount, doc)
+        doc.write(outfile.outputStream())
+        doc.close()
+        return outfile
+    }
+
+    private suspend fun doScramble(scrambleCount: Int, doc: XWPFDocument) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
             logger.info("action" to action.toString())
@@ -26,9 +42,6 @@ class DocxScrambler : AbstractScrambler() {
                 ScrambleAction.REMOVE_MEDIA -> scrambleRemoveMedia(doc)
             }
         }
-
-        doc.write(outfile.outputStream())
-        doc.close()
     }
 
     private suspend fun scrambleAddText(doc: XWPFDocument) {

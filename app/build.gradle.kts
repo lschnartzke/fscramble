@@ -25,6 +25,7 @@ dependencies {
     implementation(libs.kotlin.coroutines)
     implementation(libs.apache.poi.common)
     implementation(libs.apache.poi.ooxml)
+    implementation(libs.apache.commons.lang)
     implementation(libs.odftoolkit)
     implementation(libs.klogging)
 }
