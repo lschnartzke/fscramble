@@ -9,6 +9,7 @@ apache-poi = "5.4.0"
 odf = "0.12.0"
 klogging = "0.9.4"
 commons3 = "3.17.0"
+kaml = "0.80.1"
 
 [libraries]
 clikt = { group = "com.github.ajalt.clikt", name = "clikt", version.ref = "clikt"}
@@ -19,6 +20,7 @@ apache-poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref =
 apache-commons-lang = { group = "org.apache.commons", name = "commons-lang3", version.ref = "commons3"}
 odftoolkit = { group = "org.odftoolkit", name = "odfdom-java", version.ref = "odf"}
 klogging = { group = "io.klogging", name = "klogging-jvm", version.ref = "klogging"}
-
+kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kaml"}
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.1.0" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "1.4.20"}

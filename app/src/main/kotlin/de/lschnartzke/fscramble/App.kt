@@ -7,6 +7,7 @@ import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import de.lschnartzke.fscramble.cache.DataCache
 import de.lschnartzke.fscramble.commands.CreateCommand
+import de.lschnartzke.fscramble.commands.RunCommand
 import de.lschnartzke.fscramble.commands.ScrambleCommand
 import de.lschnartzke.fscramble.scramblers.*
 import io.klogging.config.ANSI_CONSOLE
@@ -129,5 +130,5 @@ fun main(args: Array<String>) = runBlocking {
     }
 
     logger("main").info("Starting up...")
-    App().subcommands(CreateCommand(), ScrambleCommand()).main(args)
+    App().subcommands(CreateCommand(), ScrambleCommand(), RunCommand()).main(args)
 }
