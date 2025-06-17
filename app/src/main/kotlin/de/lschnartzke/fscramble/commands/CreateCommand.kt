@@ -1,34 +1,20 @@
 package de.lschnartzke.fscramble.commands
 
 import com.github.ajalt.clikt.core.CliktCommand
-import com.github.ajalt.clikt.parameters.options.default
-import com.github.ajalt.clikt.parameters.options.defaultLazy
-import com.github.ajalt.clikt.parameters.options.flag
-import com.github.ajalt.clikt.parameters.options.help
-import com.github.ajalt.clikt.parameters.options.option
-import com.github.ajalt.clikt.parameters.options.required
-import com.github.ajalt.clikt.parameters.options.validate
+import com.github.ajalt.clikt.parameters.options.*
 import com.github.ajalt.clikt.parameters.types.int
 import com.github.ajalt.clikt.parameters.types.long
 import com.github.ajalt.clikt.parameters.types.uint
-import de.lschnartzke.fscramble.cache.DataCache
+import de.lschnartzke.fscramble.config.RunConfig
+import de.lschnartzke.fscramble.config.Size
+import de.lschnartzke.fscramble.runner.AbstractRunner
 import de.lschnartzke.fscramble.scramblers.AbstractScrambler
 import io.klogging.logger
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Semaphore
 import org.apache.commons.lang3.RandomStringUtils
 import java.io.File
-import java.util.Objects
-import java.util.Random
 import java.util.concurrent.atomic.AtomicLong
-import java.util.concurrent.locks.ReentrantLock
-import kotlin.time.Duration
 
 class CreateCommand : CliktCommand() {
     private val targetDirectory: String by option().required().help { "Directory in which to store the created files" }
@@ -62,18 +48,17 @@ class CreateCommand : CliktCommand() {
     }
 
     override fun run() {
-        runBlocking {
-            validateArgs()
-            DataCache.init(dataDirectory)
-            AbstractScrambler.overrideScrambleActions(AbstractScrambler.ScrambleAction.ADD_TEXT,
-                AbstractScrambler.ScrambleAction.ADD_MEDIA)
+        validateArgs()
+        val runConfig = RunConfig.Create(
+            targetDirectory = targetDirectory,
+            dataDirectory = dataDirectory,
+            size = Size(size),
+            count = count?.toLong(),
+            jobs = jobs
+        )
 
-            if (count != null) {
-                createFilesUsingCount()
-            } else {
-                createFilesUsingSize()
-            }
-        }
+        val runner = AbstractRunner.fromRunConfig(runConfig)
+        runner.run()
     }
 
     private suspend fun createFilesUsingCount() {
@@ -124,7 +109,6 @@ class CreateCommand : CliktCommand() {
                 delay(10L)
             }
         }
-
     }
 
     /**
