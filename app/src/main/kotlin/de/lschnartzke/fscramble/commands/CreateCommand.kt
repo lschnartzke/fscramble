@@ -20,6 +20,8 @@ class CreateCommand : CliktCommand() {
     private val targetDirectory: String by option().required().help { "Directory in which to store the created files" }
     private val dataDirectory: String by option().required().help { "Directory used to obtain data (images/text files) to use when filling new files with content" }
     private val count: UInt? by option().uint().help { "The number of files (in total) to create. Conflicts with --size" }
+    private val fileTypes: List<String> by option().multiple(default = AbstractScrambler.extensions.toList()).help { "What types of files to create. The list consists of the respective extensions. You can get a list of all supported" +
+            "file types using --list-file-types" }
     private val size: Long? by option().long().help { "Specifies the amount of data to create." +
             " This will continue running until the total amount of space occupied by created files equals the specified size." +
             " Conflicts with --count" +
@@ -30,9 +32,16 @@ class CreateCommand : CliktCommand() {
             "many jobs will be created and run in parallel if using --size. Defaults to the number of available processors on the system. Higher numbers will likely increase the" +
             "delta between the target size and amount of data actually generated." }
 
-    private val log = logger<CreateCommand>()
+    private val logger = logger<CreateCommand>()
 
     fun validateArgs() {
+        val validFileTypes = AbstractScrambler.extensions.toList()
+        for (fileType in fileTypes) {
+            if (!validFileTypes.contains(fileType)) {
+                throw IllegalArgumentException("Invalid file type: $fileType")
+            }
+        }
+
         if (count != null && size != null) {
             throw IllegalArgumentException("--size AND --count conflict, use only one")
         } else if (count == null && size == null) {
@@ -47,14 +56,15 @@ class CreateCommand : CliktCommand() {
         }
     }
 
-    override fun run() {
+    override fun run() = runBlocking {
         validateArgs()
         val runConfig = RunConfig.Create(
             targetDirectory = targetDirectory,
             dataDirectory = dataDirectory,
             size = Size(size),
             count = count?.toLong(),
-            jobs = jobs
+            jobs = jobs,
+            fileTypes = fileTypes
         )
 
         val runner = AbstractRunner.fromRunConfig(runConfig)
@@ -94,12 +104,12 @@ class CreateCommand : CliktCommand() {
                         if (file.exists()) {
                             val size = file.length()
                             val rem = remainingSize.addAndGet(-size)
-                            log.info("Created file", "size" to size, "remaining" to rem)
+                            logger.info("Created file", "size" to size, "remaining" to rem)
                         }
                     } catch (e: Exception) {
-                        log.error(e)
+                        logger.error(e)
                     } finally {
-                        log.info("Done.")
+                        logger.info("Done.")
                         delay(500L)
                         semaphore.release()
                     }

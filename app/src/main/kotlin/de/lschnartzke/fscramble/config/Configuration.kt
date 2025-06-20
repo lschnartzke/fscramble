@@ -66,6 +66,7 @@ sealed class RunConfig {
     data class Create(
         val targetDirectory: String,
         val dataDirectory: String,
+        val fileTypes: List<String>,
         val count: Long? = null,
         val size: Size? = null,
         val jobs: Int = Runtime.getRuntime().availableProcessors(),

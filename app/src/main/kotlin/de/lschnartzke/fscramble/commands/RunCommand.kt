@@ -21,6 +21,7 @@ import com.github.ajalt.clikt.parameters.options.validate
 import de.lschnartzke.fscramble.config.Configuration
 import de.lschnartzke.fscramble.config.RunConfig
 import de.lschnartzke.fscramble.runner.AbstractRunner
+import de.lschnartzke.fscramble.scramblers.AbstractScrambler
 import io.klogging.logger
 import jdk.xml.internal.SecuritySupport.readConfig
 import kotlinx.coroutines.runBlocking
@@ -47,6 +48,10 @@ class RunCommand : CliktCommand() {
         val cfg: Configuration = yamlParser.decodeFromStream(Configuration.serializer(), FileInputStream(file))
 
         return cfg
+    }
+
+    private fun validateConfig(config: Configuration) {
+        // TODO: Validate that, if present, the values for file-types in create commands in correct
     }
 
     override fun run() = runBlocking {
