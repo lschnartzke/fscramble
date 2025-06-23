@@ -24,11 +24,13 @@ class CreateRunner(private val config: RunConfig.Create) : AbstractRunner() {
     private val targetDirectory: String = config.targetDirectory
     private var size: Long? = config.size?.size
     private var count: Long? = config.count
+    private val fileTypes: List<String> = config.fileTypes
     private var jobs = config.jobs
 
     override fun run() = runBlocking {
         DataCache.init(config.dataDirectory)
         AbstractScrambler.overrideScrambleActions(AbstractScrambler.ScrambleAction.ADD_MEDIA, AbstractScrambler.ScrambleAction.ADD_TEXT)
+        AbstractScrambler.setGeneratedFileTypes(fileTypes)
 
         val tdir = File(targetDirectory)
         if (!tdir.exists()) {
@@ -77,13 +79,11 @@ class CreateRunner(private val config: RunConfig.Create) : AbstractRunner() {
                         if (file.exists()) {
                             val size = file.length()
                             val rem = remainingSize.addAndGet(-size)
-                            log.info("Created file", "size" to size, "remaining" to rem)
+                            log.info("Created file. size: {size}, remaining : {remaining}", "size" to size, "remaining" to rem)
                         }
                     } catch (e: Exception) {
-                        log.error("failed to create file", "error" to e)
+                        log.error("Failed to create file")
                     } finally {
-                        log.info("Done.")
-                        delay(500L)
                         semaphore.release()
                     }
                 }
@@ -110,8 +110,12 @@ class CreateRunner(private val config: RunConfig.Create) : AbstractRunner() {
         // SAFETY: extension is coming from AbstractScrambler, so it better exists in the mapping.
         val scrambler = AbstractScrambler.scramblerExtensionMap[extension]!!
 
-        val file = scrambler.createNewFile(filename, targetDirectory)
-
-        return file
+        try {
+            val file = scrambler.createNewFile(filename, targetDirectory)
+            return file
+        } catch (e: Exception) {
+            log.error("Failed to create file {filename}: {error}", filename, "error" to e)
+            throw e
+        }
     }
 }

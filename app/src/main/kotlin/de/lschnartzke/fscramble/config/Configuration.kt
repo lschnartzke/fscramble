@@ -1,5 +1,8 @@
 package de.lschnartzke.fscramble.config
 
+import de.lschnartzke.fscramble.scramblers.AbstractScrambler
+import io.klogging.logger
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -14,10 +17,11 @@ data class Size(val size: Long? = null)
 
 object SizeSerializer : KSerializer<Size> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(SizeSerializer::class.qualifiedName!!, PrimitiveKind.STRING)
+    private val logger = logger<SizeSerializer>()
 
     override fun deserialize(decoder: Decoder): Size {
         val raw = decoder.decodeString()
-        val regex = Regex("([0-9]+)\\w*([GMKTgmkt]?)")
+        val regex = Regex("([0-9]+)\\s*([GMKTgmkt]?)")
         val res = regex.find(raw)
         if (res == null) {
             return Size(null)
@@ -66,6 +70,7 @@ sealed class RunConfig {
     data class Create(
         val targetDirectory: String,
         val dataDirectory: String,
+        val fileTypes: List<String> = AbstractScrambler.supportedExtensions,
         val count: Long? = null,
         val size: Size? = null,
         val jobs: Int = Runtime.getRuntime().availableProcessors(),

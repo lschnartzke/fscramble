@@ -27,7 +27,26 @@ abstract class AbstractScrambler() {
             AbstractScrambler.actions = actions as Array<ScrambleAction>
         }
 
-        val extensions = arrayOf("odt", "pdf", "ods", "docx", "xlsx", "txt")
+        val supportedExtensions: List<String>
+            get() = listOf("odt", "pdf", "ods", "docx", "xlsx", "txt")
+        var extensions = supportedExtensions.toList()
+            private set
+
+        /**
+         * Set what types of files can be scrambled and created. MUST be called before starting the scrambling/creation process.
+         *
+         * Ideally, the list does not contain any duplicates, as this will also affect the probability for the file
+         * type to be created/scrambled. (Note that this could be fixed by using a HashSet, but I forgot about until
+         * now and don't feel like vibe-refactoring this atm, might fix later idk)
+         *
+         * @throws IllegalArgumentException if `newExtensions` contains unsupported extensions
+         */
+        fun setGeneratedFileTypes(newExtensions: List<String>) {
+            if (!supportedExtensions.containsAll(newExtensions))
+                throw IllegalArgumentException("List contains unsupported extensions: $newExtensions (allowed: $supportedExtensions)")
+
+            extensions = newExtensions
+        }
 
         fun randomExtension() = extensions.random()
 
