@@ -32,7 +32,7 @@ class OdsScrambler : AbstractScrambler() {
     private suspend fun doScramble(scrambleCount: Int, doc: OdfSpreadsheetDocument) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.info("action" to action.toString())
+            logger.debug("action" to action.toString())
             when (action) {
                 ScrambleAction.ADD_TEXT -> scrambleAddText(doc)
                 ScrambleAction.REMOVE_TEXT -> scrambleRemoveText(doc)

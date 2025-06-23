@@ -24,7 +24,7 @@ class PlaintextScrambler : AbstractScrambler() {
     private suspend fun doScramble(scrambleCount: Int, fileLines: MutableList<String>) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.info("action" to action.toString())
+            logger.debug("action" to action.toString())
             when (action) {
                 ScrambleAction.ADD_TEXT, ScrambleAction.ADD_MEDIA -> scrambleAddText(fileLines)
                 ScrambleAction.REMOVE_TEXT, ScrambleAction.REMOVE_MEDIA -> scrambleRemoveText(fileLines)

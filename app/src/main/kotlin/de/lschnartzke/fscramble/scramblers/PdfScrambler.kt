@@ -71,7 +71,7 @@ class PdfScrambler() : AbstractScrambler() {
     private suspend fun doScramble(scrambleCount: Int, pdfDoc: Document) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.info("action" to action.toString())
+            logger.debug("action" to action.toString())
             try {
                 when (action) {
                     ScrambleAction.ADD_TEXT -> scrambleAddText(pdfDoc)
@@ -111,7 +111,6 @@ class PdfScrambler() : AbstractScrambler() {
             // apparently this is lua now, as the pages are indexed at one and somewhere in the callstack is a
             // --index to get the actual array index. Yay.
             val newPageIndex = rng.nextInt(until = doc.pdfDocument.numberOfPages) + 1
-            println("pageIndex: ${newPageIndex}")
             doc.pdfDocument.addNewPage(newPageIndex)
         }
 

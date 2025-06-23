@@ -24,6 +24,7 @@ import kotlin.system.exitProcess
  */
 class App : CliktCommand() {
     private val listFileTypes: Boolean by option("--list-file-types").flag().help { "List all available file types and exit" }
+    override val invokeWithoutSubcommand: Boolean = true
 
     private val logger = logger<App>()
 
@@ -36,7 +37,7 @@ class App : CliktCommand() {
 
     private fun listAvailableFileTypes() = runBlocking {
         val fileTypes = AbstractScrambler.extensions
-        logger.info("Available file types", "extensions" to fileTypes)
+        logger.info("Available file types: {fileTypes}", fileTypes)
     }
 }
 
