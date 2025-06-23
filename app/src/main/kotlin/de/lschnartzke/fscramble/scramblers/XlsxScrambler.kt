@@ -2,6 +2,7 @@ package de.lschnartzke.fscramble.scramblers
 
 import de.lschnartzke.fscramble.cache.DataCache
 import io.klogging.logger
+import kotlinx.coroutines.runBlocking
 import org.apache.poi.xssf.usermodel.XSSFCell
 import org.apache.poi.xssf.usermodel.XSSFSheet
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
@@ -23,7 +24,7 @@ class XlsxScrambler : AbstractScrambler() {
     private suspend fun doScramble(scrambleCount: Int, doc: XSSFWorkbook) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.info("action" to action.toString())
+            logger.debug("action" to action.toString())
             when (action) {
                 ScrambleAction.ADD_TEXT -> scrambleAddText(doc)
                 ScrambleAction.REMOVE_TEXT -> scrambleRemoveText(doc)
@@ -50,7 +51,8 @@ class XlsxScrambler : AbstractScrambler() {
         val row = if (sheet.firstRowNum <= 0 || sheet.lastRowNum <= 0) {
             sheet.createRow(lastCreatedRowIndex++)
         } else {
-            sheet.getRow(rng.nextInt(from = sheet.firstRowNum, until = sheet.lastRowNum))
+            // this is probably not what you'd want, but it's working for the time being (might fix later, idk)
+            sheet.getRow(rng.nextInt(from = 0, until = sheet.lastRowNum)) ?: sheet.createRow(lastCreatedRowIndex++)
         }
         val cell = if (row.firstCellNum <= 0 || row.lastCellNum <= 0) {
             row.createCell(lastCreatedColumnIndex++)
@@ -89,7 +91,6 @@ class XlsxScrambler : AbstractScrambler() {
 
         val pictureIndex = doc.addPicture(imageData.content, imageData.xlsxPictureType())
         val pictureData = doc.allPictures[pictureIndex]
-        logger.info("picturePartName" to pictureData.packagePart.partName)
     }
 
     private suspend fun scrambleRemoveMedia(doc: XSSFWorkbook) {

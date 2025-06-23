@@ -21,6 +21,7 @@ import com.github.ajalt.clikt.parameters.options.validate
 import de.lschnartzke.fscramble.config.Configuration
 import de.lschnartzke.fscramble.config.RunConfig
 import de.lschnartzke.fscramble.runner.AbstractRunner
+import de.lschnartzke.fscramble.scramblers.AbstractScrambler
 import io.klogging.logger
 import jdk.xml.internal.SecuritySupport.readConfig
 import kotlinx.coroutines.runBlocking
@@ -34,7 +35,7 @@ class RunCommand : CliktCommand() {
     val mode: String? by argument().optional().help { "THe configuration to run. The specified mode must exist under the 'run' key in the config file" }
     val list: Boolean by option("-l", "--list").flag().help { "If present, list all available modes and exit" }
 
-    private val log = logger<RunCommand>()
+    private val logger = logger<RunCommand>()
 
     private fun readConfig(file: String): Configuration {
         val yamlParser = Yaml(
@@ -49,26 +50,45 @@ class RunCommand : CliktCommand() {
         return cfg
     }
 
-    override fun run() = runBlocking {
-        log.info("Starting...")
+    private suspend fun validateConfig(config: Configuration) {
+        // TODO: Validate that, if present, the values for file-types in create commands in correct
+        var error = false
+        for ((key, createConfig) in config.run.entries) {
+            if (createConfig !is RunConfig.Create)
+                continue
+
+            val validFileTypes = AbstractScrambler.extensions.toList()
+            if (!validFileTypes.containsAll(createConfig.fileTypes)) {
+                logger.error("Invalid file type in configuration", "key" to key)
+                error = true
+            }
+        }
+
+        if (error) {
+            exitProcess(1)
+        }
+    }
+
+    override fun run(): Unit = runBlocking {
+        logger.info("Starting...")
         val config = readConfig(configFile)
 
         if (list || mode == null) {
             val modes = config.run.keys.toCollection(mutableListOf())
-            log.info("Available modes: $modes")
+            logger.info("Available modes: $modes")
             exitProcess(0)
         }
 
         if (!config.run.containsKey(mode)) {
-            log.error("Mode $mode does not exist, available modes: ${config.run.keys}")
+            logger.error("Mode $mode does not exist, available modes: ${config.run.keys}")
             exitProcess(1)
         }
 
         val runCfg = config.run[mode]!!
-        log.info("Running...")
+        logger.info("Running...")
 
         val runner = AbstractRunner.fromRunConfig(runCfg)
         runner.run()
-        log.info("Done.")
+        logger.info("Done.")
     }
 }

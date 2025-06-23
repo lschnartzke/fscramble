@@ -33,7 +33,7 @@ class DocxScrambler : AbstractScrambler() {
     private suspend fun doScramble(scrambleCount: Int, doc: XWPFDocument) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.info("action" to action.toString())
+            logger.debug("action" to action.toString())
 
             when (action) {
                 ScrambleAction.ADD_TEXT -> scrambleAddText(doc)
