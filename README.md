@@ -63,7 +63,9 @@ Usage: `fscramble create <options>`, where options can be any of the following:
 * (conditional) `--count <num>`: The amount of files to create. If present, a flat number of files will be created.
 Conflicts with `--size`.
 * (conditional) `--size <num>`: Create files until the accumulated file size is larger than or equal to the specified value.
-Conflicts with `--count`. Note that the total size will almost always be larger than specified. 
+Conflicts with `--count`. Note that the total size will almost always be larger than specified.
+* (optional) `--file-types <types>`: What files (specified by extension) to create. By default, all available file types
+are created. You can get a list of supported file types by running `fscramble --list-file-types`
 * (optional) `--jobs <num>`: The amount of jobs to run in parallel. Will default to the amount of available processors.
 Affects the precision of `--size`.
 
@@ -96,6 +98,10 @@ run:
     command: "create"
     target-directory: "/tmp/out"
     data-directory: "./data"
+    file-types:
+      - pdf
+      - txt
+      - docx
     count: 32
   create-size:
     command: "create"
@@ -103,7 +109,7 @@ run:
     data-directory: "./data"
     size: 1G
 ```
-Note that, in the configuration format, `size` can be used with units to simplify writing larger values. For clarificaton:
+Note that, in the configuration format, `size` can be used with units to simplify writing larger values. For clarification:
 * Units `k, K, m, M, g, G, t, T` are supported
 * The numeric value *must* be an integer.
 * The numeric value is multiplied with `1024`.
