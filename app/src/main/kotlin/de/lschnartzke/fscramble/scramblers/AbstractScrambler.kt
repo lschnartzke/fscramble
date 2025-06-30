@@ -73,6 +73,12 @@ abstract class AbstractScrambler() {
     /**
      * Create a new file from scratch, filling it with random content from the data cache. SHOULD not perform delete
      * operation (there is nothing to delete in a newly created file)
+     *
+     * Creates a new file in `outpath`. Thus, it can be assumed that the resulting file will be at `outpath/filename`.
+     *
+     * @param filename The basename of te file. This includes name and extension, but no path.
+     * @param outpath The directory in which to store the resulting file.
+     * @param scrambleCount How many actions to perform on the new file.
      */
     abstract suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int = 50): File
 
@@ -89,7 +95,8 @@ abstract class AbstractScrambler() {
 
     /**
      * Scramble the provided file.
-     * @param input - the file to scramble. Must always point to a file
+     * @param input - the file to scramble. Must always point to a file. If the scrambling involves archives, the parent
+     * of the input file should be a directory containing files. Single-file mode will cause issues with this.
      * @param output - Where to save the scrambled file. Can be a filename or existing directory.
      *                 If output points to a directory, the resulting file will be at output/input.pdf
      */
