@@ -48,6 +48,14 @@ abstract class AbstractScrambler() {
             extensions = newExtensions
         }
 
+        fun enableArchives(archiveTypes: List<String> = AbstractArchiveScrambler.supportedArchives) {
+            // TODO: Too many cross references across abstract classes. This should be cleaned up (probably won't)
+            if (!AbstractArchiveScrambler.supportedArchives.containsAll(archiveTypes))
+                throw IllegalArgumentException("List contains unsupported archives: $archiveTypes (allowed: ${AbstractArchiveScrambler.supportedArchives})")
+
+            extensions = extensions.toMutableList().apply { addAll(archiveTypes) }
+        }
+
         fun randomExtension() = extensions.random()
 
         val scramblerExtensionMap: HashMap<String, AbstractScrambler> = hashMapOf(
@@ -57,6 +65,8 @@ abstract class AbstractScrambler() {
             "docx" to DocxScrambler(),
             "txt" to PlaintextScrambler(),
             "xlsx" to XlsxScrambler(),
+            "tar" to ArchiveScrambler(),
+            "zip" to ArchiveScrambler(),
         )
     }
 

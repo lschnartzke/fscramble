@@ -2,10 +2,10 @@ package de.lschnartzke.fscramble.scramblers
 
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
+import org.apache.commons.compress.archivers.zip.ZipFile
 import org.apache.commons.compress.utils.IOUtils
 import org.apache.commons.io.FileUtils
 import java.io.File
-import java.util.zip.ZipFile
 
 class ZipScrambler : AbstractArchiveScrambler() {
     /**
@@ -38,7 +38,7 @@ class ZipScrambler : AbstractArchiveScrambler() {
         if (inputFiles.isEmpty() && input == null)
             return
 
-        val entryList = input?.entries()?.toList()?.toMutableList()
+        val entryList: MutableList<ZipArchiveEntry> = mutableListOf()
 
         repeat(scrambleCount) {
             val scrambleAction = getScrambleAction()
@@ -81,17 +81,6 @@ class ZipScrambler : AbstractArchiveScrambler() {
                     ScrambleAction.ADD_MEDIA -> {
                         // SAFETY: (proof) the list is guaranteed to be non-null if input is non-null, and we're only
                         // in this branch, if input is non-null. Therefore, entryList cannot be null. [ ]
-                        if (entryList!!.isNotEmpty()) {
-                            // SAFETY: (proof) the list is guaranteed to be non-null if input is non-null, and we're only
-                            // in this branch, if input is non-null. Therefore, entryList cannot be null. [ ]
-                            val entry = entryList!!.random()
-                            input.getInputStream(entry).use { istream ->
-                                // this will probably crash if we're reading files (a lot) bigger than available memory
-                                // swap, so for safety reasons copying files that would crash this implementation are hereby
-                                // discouraged and officially unsupported (until I need this feature)
-                                output.write(istream.readAllBytes())
-                            }
-                        }
                     }
                     else -> {}
                 }
@@ -106,7 +95,7 @@ class ZipScrambler : AbstractArchiveScrambler() {
         val ifile  = File(input)
         val ofile = getOutfile(input, output)
         val workingDirectory = ifile.parentFile
-        val inputZipFile = ZipFile(ifile)
+        val inputZipFile = ZipFile.Builder().apply { file = ifile }.get()
         val outputZipFile = ZipArchiveOutputStream(ofile)
 
         doScramble(inputZipFile, outputZipFile, workingDirectory, scrambleCount)

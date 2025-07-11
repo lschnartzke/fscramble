@@ -8,6 +8,7 @@ import com.github.ajalt.clikt.parameters.types.uint
 import de.lschnartzke.fscramble.config.RunConfig
 import de.lschnartzke.fscramble.config.Size
 import de.lschnartzke.fscramble.runner.AbstractRunner
+import de.lschnartzke.fscramble.scramblers.AbstractArchiveScrambler
 import de.lschnartzke.fscramble.scramblers.AbstractScrambler
 import io.klogging.logger
 import kotlinx.coroutines.*
@@ -16,9 +17,12 @@ import java.io.File
 class CreateCommand : CliktCommand() {
     private val targetDirectory: String by option().required().help { "Directory in which to store the created files" }
     private val dataDirectory: String by option().required().help { "Directory used to obtain data (images/text files) to use when filling new files with content" }
+    private val inputDirectory: String? by option().help { "Directory containing random files that may be used to create scrambled archives. If not present, --dataDirectory will be used instead. Ignored if --archives is not present." }
     private val count: UInt? by option().uint().help { "The number of files (in total) to create. Conflicts with --size" }
     private val fileTypes: List<String> by option().multiple(default = AbstractScrambler.extensions.toList()).help { "What types of files to create. The list consists of the respective extensions. You can get a list of all supported" +
             "file types using --list-file-types" }
+    private val archives: Boolean by option().flag().help { "If present, also create archives" }
+    private val archiveTypes: List<String> by option().multiple(default = AbstractArchiveScrambler.supportedArchives.toList()).help { "Specify what kind of archives to create" }
     private val size: Long? by option().long().help { "Specifies the amount of data to create." +
             " This will continue running until the total amount of space occupied by created files equals the specified size." +
             " Conflicts with --count" +
@@ -32,10 +36,17 @@ class CreateCommand : CliktCommand() {
     private val logger = logger<CreateCommand>()
 
     fun validateArgs() {
-        val validFileTypes = AbstractScrambler.extensions.toList()
+        val validFileTypes = AbstractScrambler.extensions
         for (fileType in fileTypes) {
             if (!validFileTypes.contains(fileType)) {
                 throw IllegalArgumentException("Invalid file type: $fileType")
+            }
+        }
+
+        val validArchiveTypes = AbstractArchiveScrambler.supportedArchives
+        for (archive in archiveTypes) {
+            if (!validArchiveTypes.contains(archive)) {
+                throw IllegalArgumentException("Invalid archive type: $archive")
             }
         }
 
@@ -58,7 +69,10 @@ class CreateCommand : CliktCommand() {
         val runConfig = RunConfig.Create(
             targetDirectory = targetDirectory,
             dataDirectory = dataDirectory,
+            inputDirectory = inputDirectory,
             size = Size(size),
+            archives = archives,
+            archiveTypes = archiveTypes,
             count = count?.toLong(),
             jobs = jobs,
             fileTypes = fileTypes

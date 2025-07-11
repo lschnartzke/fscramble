@@ -2,6 +2,7 @@ package de.lschnartzke.fscramble.runner
 
 import de.lschnartzke.fscramble.cache.DataCache
 import de.lschnartzke.fscramble.config.RunConfig
+import de.lschnartzke.fscramble.scramblers.AbstractArchiveScrambler
 import de.lschnartzke.fscramble.scramblers.AbstractScrambler
 import io.klogging.logger
 import kotlinx.coroutines.CoroutineScope
@@ -20,17 +21,21 @@ import kotlin.properties.Delegates
 
 class CreateRunner(private val config: RunConfig.Create) : AbstractRunner() {
     private val log = logger<CreateRunner>()
-
     private val targetDirectory: String = config.targetDirectory
+    private val inputDirectory = config.inputDirectory ?: targetDirectory
     private var size: Long? = config.size?.size
     private var count: Long? = config.count
-    private val fileTypes: List<String> = config.fileTypes
+    private var fileTypes: List<String> = config.fileTypes
     private var jobs = config.jobs
 
     override fun run() = runBlocking {
         DataCache.init(config.dataDirectory)
         AbstractScrambler.overrideScrambleActions(AbstractScrambler.ScrambleAction.ADD_MEDIA, AbstractScrambler.ScrambleAction.ADD_TEXT)
+
+        // TODO: Currently, setGeneratedFileTypes overrides the list of extensions while enableArchives adds to it.
+        // thus, enableArchives needs to be called after setGeneratedFileTypes, otherwise the archives will be overridden
         AbstractScrambler.setGeneratedFileTypes(fileTypes)
+        AbstractScrambler.enableArchives(config.archiveTypes)
 
         val tdir = File(targetDirectory)
         if (!tdir.exists()) {
@@ -111,10 +116,11 @@ class CreateRunner(private val config: RunConfig.Create) : AbstractRunner() {
         val scrambler = AbstractScrambler.scramblerExtensionMap[extension]!!
 
         try {
-            val file = scrambler.createNewFile(filename, targetDirectory)
+            val file = if (scrambler is AbstractArchiveScrambler) scrambler.createNewArchive(filename, File(targetDirectory), File(inputDirectory), 50) else scrambler.createNewFile(filename, targetDirectory)
             return file
         } catch (e: Exception) {
-            log.error("Failed to create file {filename}: {error}", filename, "error" to e)
+            log.error("Failed to create file {filename}: {error}, {stacktrace}", filename, "error" to e)
+            e.printStackTrace()
             throw e
         }
     }

@@ -19,13 +19,13 @@ class ScrambleRunner(private val config: RunConfig.Scramble) : AbstractRunner() 
 
     val scope = CoroutineScope(Dispatchers.Default)
 
-
     override fun run() = runBlocking {
         DataCache.init(config.dataDirectory)
+        if (config.archives)
+            AbstractScrambler.enableArchives(config.archiveTypes)
 
         scrambleDirectory(inputDirectory, targetDirectory)
         return@runBlocking
-
     }
 
     private suspend fun scrambleDirectory(input: String, output: String) {
