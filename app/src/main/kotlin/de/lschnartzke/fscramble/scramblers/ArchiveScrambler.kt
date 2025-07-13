@@ -5,6 +5,7 @@ import de.lschnartzke.fscramble.wrapper.ArchiveWrapper
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.io.FileUtils
 import java.io.File
+import kotlin.io.path.absolute
 
 class ArchiveScrambler : AbstractArchiveScrambler() {
     override suspend fun createNewArchive(
@@ -33,19 +34,25 @@ class ArchiveScrambler : AbstractArchiveScrambler() {
 
         val archiveEntries = archive.entries
 
+        fun addFileToArchive() {
+            val file = inputFiles.random()
+            val entry = archive.getArchiveEntryWrapperForFile(file)
+            archive.putArchiveEntry(entry)
+            if (file.isFile)
+                FileUtils.copyFile(file, archive)
+            archive.closeArchiveEntry()
+            if (file.isDirectory)
+                archive.addDirectory(inputDirectory.toPath().absolute(), file.toPath().absolute())
+
+            inputFiles.remove(file)
+        }
+
         repeat(scrambleCount) {
             val scrambleAction = getScrambleAction()
             if (archive.hasNoInputFile() && inputFiles.isNotEmpty()) {
                 when (scrambleAction) {
                     ScrambleAction.ADD_TEXT -> {
-                        val file = inputFiles.random()
-                        val entry = archive.getArchiveEntryWrapperForFile(file)
-                        archive.putArchiveEntry(entry)
-                        if (file.isFile)
-                            FileUtils.copyFile(file, archive)
-                        archive.closeArchiveEntry()
-
-                        inputFiles.remove(file)
+                        addFileToArchive()
                     }
                     else -> {}
                 }
@@ -53,15 +60,7 @@ class ArchiveScrambler : AbstractArchiveScrambler() {
                 when (scrambleAction) {
                     ScrambleAction.ADD_TEXT -> {
                         if (inputFiles.isNotEmpty()) {
-                            val file = inputFiles.random()
-                            val entry = archive.getArchiveEntryWrapperForFile(file)
-                            archive.putArchiveEntry(entry)
-                            if (file.isFile)
-                                FileUtils.copyFile(file, archive)
-                            archive.closeArchiveEntry()
-
-                            // remove to avoid duplicates
-                            inputFiles.remove(file)
+                            addFileToArchive()
                         }
                     }
 
@@ -70,7 +69,7 @@ class ArchiveScrambler : AbstractArchiveScrambler() {
                         if (archiveEntries.isNotEmpty()) {
                             val entry = archiveEntries.random()
                             archive.putArchiveEntry(entry)
-                            if (!entry.isDirectory) {
+                            if (entry.isDirectory) {
                                 archive.getInputStream(entry).use {
                                     // this will probably crash if we're reading files (a lot) bigger than available memory
                                     // swap, so for safety reasons copying files that would crash this implementation are hereby

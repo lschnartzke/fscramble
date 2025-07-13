@@ -6,9 +6,16 @@ import org.apache.commons.compress.archivers.tar.TarFile
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.apache.commons.compress.archivers.zip.ZipFile
+import org.apache.commons.io.FileUtils
 import java.io.File
 import java.io.InputStream
 import java.io.OutputStream
+import java.nio.file.Path
+import java.nio.file.Paths
+import kotlin.io.path.absolute
+import kotlin.io.path.isDirectory
+import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.relativeTo
 
 sealed class ArchiveWrapper : OutputStream() {
     companion object {
@@ -19,11 +26,10 @@ sealed class ArchiveWrapper : OutputStream() {
         }
 
         fun getArchiveWrapperByFile(ifile: File, ofile: File): ArchiveWrapper = when (ofile.extension) {
-            "zip" -> ArchiveWrapper.ZipArchiveWrapper(ZipFile(ifile), ZipArchiveOutputStream(ofile))
+            "zip" -> ArchiveWrapper.ZipArchiveWrapper(ZipFile.Builder().setFile(ifile).get(), ZipArchiveOutputStream(ofile))
             "tar" -> ArchiveWrapper.TarArchiveWrapper(TarFile(ifile), TarArchiveOutputStream(ofile.outputStream()))
             else -> throw IllegalArgumentException("Unsupported file format: $ofile")
         }
-
     }
 
     class TarArchiveWrapper(val archive: TarFile?, val writer: TarArchiveOutputStream) : ArchiveWrapper() {
@@ -140,6 +146,31 @@ sealed class ArchiveWrapper : OutputStream() {
                 file.name
             )
         )
+    }
+
+    /**
+     * Recursively add an entire directory to the archive. Assumes that the entry for the root directory already exists
+     * in the archive.
+     *
+     * @param sourceDir the root directory to add. Used to construct the correct relative paths for the archive.
+     * @param currentDir the directory currently being processed. MUST be a subdirectory of sourceDir or equal to it.
+     */
+    fun addDirectory(sourceDir: Path, currentDir: Path = sourceDir.absolute()) {
+        val relativePath = sourceDir.relativize(currentDir)
+        val files = currentDir.listDirectoryEntries()
+
+        for (file in files) {
+            val relativeFile = file.relativeTo(relativePath)
+            val entry = getArchiveEntryWrapperForFile(relativeFile.toFile())
+            putArchiveEntry(entry)
+            if (!file.isDirectory()) {
+                FileUtils.copyFile(file.toFile(), this)
+            }
+            closeArchiveEntry()
+            if (file.isDirectory())
+                addDirectory(sourceDir, file.absolute())
+        }
+
     }
 
 }
