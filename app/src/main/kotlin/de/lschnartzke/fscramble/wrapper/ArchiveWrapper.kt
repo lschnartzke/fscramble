@@ -13,21 +13,24 @@ import java.io.OutputStream
 import java.nio.file.Path
 import java.nio.file.Paths
 import kotlin.io.path.absolute
+import kotlin.io.path.fileSize
+import kotlin.io.path.getLastModifiedTime
 import kotlin.io.path.isDirectory
 import kotlin.io.path.listDirectoryEntries
+import kotlin.io.path.name
 import kotlin.io.path.relativeTo
 
 sealed class ArchiveWrapper : OutputStream() {
     companion object {
         fun getArchiveWrapperByFile(file: File): ArchiveWrapper = when (file.extension) {
-            "zip" -> ArchiveWrapper.ZipArchiveWrapper(null, ZipArchiveOutputStream(file))
-            "tar" -> ArchiveWrapper.TarArchiveWrapper(null, TarArchiveOutputStream(file.outputStream()))
+            "zip" -> ZipArchiveWrapper(null, ZipArchiveOutputStream(file))
+            "tar" -> TarArchiveWrapper(null, TarArchiveOutputStream(file.outputStream()))
             else -> throw IllegalArgumentException("Unsupported file format: $file")
         }
 
         fun getArchiveWrapperByFile(ifile: File, ofile: File): ArchiveWrapper = when (ofile.extension) {
-            "zip" -> ArchiveWrapper.ZipArchiveWrapper(ZipFile.Builder().setFile(ifile).get(), ZipArchiveOutputStream(ofile))
-            "tar" -> ArchiveWrapper.TarArchiveWrapper(TarFile(ifile), TarArchiveOutputStream(ofile.outputStream()))
+            "zip" -> ZipArchiveWrapper(ZipFile.Builder().setFile(ifile).get(), ZipArchiveOutputStream(ofile))
+            "tar" -> TarArchiveWrapper(TarFile(ifile), TarArchiveOutputStream(ofile.outputStream()))
             else -> throw IllegalArgumentException("Unsupported file format: $ofile")
         }
     }
@@ -132,20 +135,23 @@ sealed class ArchiveWrapper : OutputStream() {
 
     abstract fun finish()
 
-    fun getArchiveEntryWrapperForFile(file: File): ArchiveEntryWrapper = when (this) {
-        is ZipArchiveWrapper -> ArchiveEntryWrapper.ZipArchiveEntryWrapper(
-            ZipArchiveEntry(
-                file,
-                file.name
+    fun getArchiveEntryWrapperForFile(ifile: File, forceDir: Boolean = false): ArchiveEntryWrapper {
+        val file = if (forceDir && !ifile.name.endsWith("/")) File(ifile, "/") else ifile
+        return when (this) {
+            is ZipArchiveWrapper -> ArchiveEntryWrapper.ZipArchiveEntryWrapper(
+                ZipArchiveEntry(
+                    file,
+                    file.name
+                )
             )
-        )
 
-        is TarArchiveWrapper -> ArchiveEntryWrapper.TarArchiveEntryWrapper(
-            TarArchiveEntry(
-                file,
-                file.name
+            is TarArchiveWrapper -> ArchiveEntryWrapper.TarArchiveEntryWrapper(
+                TarArchiveEntry(
+                    file,
+                    file.name
+                )
             )
-        )
+        }
     }
 
     /**
@@ -156,14 +162,19 @@ sealed class ArchiveWrapper : OutputStream() {
      * @param currentDir the directory currently being processed. MUST be a subdirectory of sourceDir or equal to it.
      */
     fun addDirectory(sourceDir: Path, currentDir: Path = sourceDir.absolute()) {
-        val relativePath = sourceDir.relativize(currentDir)
+        val relativePath = sourceDir.normalize().relativize(currentDir)
         val files = currentDir.listDirectoryEntries()
 
+
         for (file in files) {
-            val relativeFile = file.relativeTo(relativePath)
-            val entry = getArchiveEntryWrapperForFile(relativeFile.toFile())
+            val relativeFile = Paths.get("/", sourceDir.relativize(file).toString())
+            val forceDir = file.isDirectory()
+            val entry = getArchiveEntryWrapperForFile(relativeFile.toFile(), forceDir)
+            entry.size = file.fileSize()
+            entry.lastModifiedTime = file.getLastModifiedTime()
             putArchiveEntry(entry)
             if (!file.isDirectory()) {
+                println("Copying file $file to archive")
                 FileUtils.copyFile(file.toFile(), this)
             }
             closeArchiveEntry()

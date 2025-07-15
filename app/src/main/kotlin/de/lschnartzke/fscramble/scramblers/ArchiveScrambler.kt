@@ -42,7 +42,7 @@ class ArchiveScrambler : AbstractArchiveScrambler() {
                 FileUtils.copyFile(file, archive)
             archive.closeArchiveEntry()
             if (file.isDirectory)
-                archive.addDirectory(inputDirectory.toPath().absolute(), file.toPath().absolute())
+                archive.addDirectory(inputDirectory.toPath().absolute().normalize(), file.toPath().absolute().normalize())
 
             inputFiles.remove(file)
         }
