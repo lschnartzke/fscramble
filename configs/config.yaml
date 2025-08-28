@@ -1,0 +1,14 @@
+run:
+  create-sized:
+    command: "create"
+    target-directory: ./sized
+    data-directory: ./data
+    size: 1G
+
+  create-archives:
+    command: "create"
+    target-directory: "/tmp/create-archives"
+    data-directory: "./data"
+    input-directory: ./app
+    archives: true
+    size: 500M

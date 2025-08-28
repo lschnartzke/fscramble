@@ -47,6 +47,8 @@ Usage: `fscramble scramble <options>`, where options can be any of the following
 * (required) `--input-directory <dir>`: Directory from which to read files
 * (required) `--target-directory <dir>`: Directory to which scrambled files will be written
 * (required) `--data-directory <dir>`: Directory which contains the content used to scramble files
+* (optional) `--archives`: Also scramble (and create) archives
+* (optional) `--archive-types <types...>`: What types of archives to create/scramble
 * (optional) `--count <num>`: Amount of times a *scramble action* is performed per file. (Default: 20)
 * (optional) `--create`: If present, alongside scrambling new files will also be created
 * (optional) `--create-min <num>`: The minimum amount of files to create. Ignored if `--create` is not present (Default: 0)
@@ -58,8 +60,11 @@ are used during scrambling. The data directory itself will be left untouched.
 
 ### 'create'
 Usage: `fscramble create <options>`, where options can be any of the following:
-* (required) `--target-directory`: Directory to which created files will be written
-* (required) `--data-directory`: Directory which will be used for the content of the created files
+* (required) `--target-directory <dir>`: Directory to which created files will be written
+* (required) `--data-directory <dir>`: Directory which will be used for the content of the created files
+* (optional) `--input-directory <dir>`: Directory to use as input for archives. If omitted, `--data-directory` is used instead.
+* (optional) `--archives`: Also create archives
+* (optional) `--archive-types`: What types of archives to create
 * (conditional) `--count <num>`: The amount of files to create. If present, a flat number of files will be created.
 Conflicts with `--size`.
 * (conditional) `--size <num>`: Create files until the accumulated file size is larger than or equal to the specified value.
@@ -108,6 +113,15 @@ run:
     target-directory: "/tmp/out"
     data-directory: "./data"
     size: 1G
+  create-archives:
+    command: "create"
+    target-directory: "/tmp/out"
+    data-directory: "./data"
+    input-directory: "./input"
+    archives: true
+    archive-types:
+      - tar
+      - zip
 ```
 Note that, in the configuration format, `size` can be used with units to simplify writing larger values. For clarification:
 * Units `k, K, m, M, g, G, t, T` are supported

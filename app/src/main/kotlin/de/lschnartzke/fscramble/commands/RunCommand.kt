@@ -21,6 +21,7 @@ import com.github.ajalt.clikt.parameters.options.validate
 import de.lschnartzke.fscramble.config.Configuration
 import de.lschnartzke.fscramble.config.RunConfig
 import de.lschnartzke.fscramble.runner.AbstractRunner
+import de.lschnartzke.fscramble.scramblers.AbstractArchiveScrambler
 import de.lschnartzke.fscramble.scramblers.AbstractScrambler
 import io.klogging.logger
 import jdk.xml.internal.SecuritySupport.readConfig
@@ -51,20 +52,34 @@ class RunCommand : CliktCommand() {
     }
 
     private suspend fun validateConfig(config: Configuration) {
-        // TODO: Validate that, if present, the values for file-types in create commands in correct
         var error = false
-        for ((key, createConfig) in config.run.entries) {
-            if (createConfig !is RunConfig.Create)
-                continue
+        val validFileTypes = AbstractScrambler.extensions
+        val validArchiveTypes = AbstractArchiveScrambler.supportedArchives
+        for ((key, configEntry) in config.run.entries) {
+            // TODO: Validate correct file and archive types for both scramble and create commands
+            when (configEntry) {
+                is RunConfig.Create -> {
+                    if (!validFileTypes.containsAll(configEntry.fileTypes)) {
+                        logger.error("Invalid file type in configuration: ${configEntry.fileTypes} (valid: $validFileTypes)")
+                        error = true
+                    }
 
-            val validFileTypes = AbstractScrambler.extensions.toList()
-            if (!validFileTypes.containsAll(createConfig.fileTypes)) {
-                logger.error("Invalid file type in configuration", "key" to key)
-                error = true
+                    if (!validArchiveTypes.containsAll(configEntry.archiveTypes)) {
+                        logger.error("Invalid archive type in configuration: ${configEntry.archiveTypes} (valid: $validArchiveTypes)")
+                        error = true
+                    }
+                }
+                is RunConfig.Scramble -> {
+                    if (!validArchiveTypes.containsAll(configEntry.archiveTypes)) {
+                        logger.error("Invalid archive type in configuration: ${configEntry.archiveTypes} (valid: $validArchiveTypes)")
+                        error = true
+                    }
+                }
             }
         }
 
         if (error) {
+            logger.info("Cannot proceed with errors, exiting...")
             exitProcess(1)
         }
     }

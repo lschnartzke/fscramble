@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.apache.poi.common)
     implementation(libs.apache.poi.ooxml)
     implementation(libs.apache.commons.lang)
+    implementation(libs.apache.commons.compress)
     implementation(libs.odftoolkit)
     implementation(libs.klogging)
     implementation(libs.kaml)
