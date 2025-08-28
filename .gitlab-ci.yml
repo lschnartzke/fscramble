@@ -1,13 +1,77 @@
 stages:
+  - test
   - build
+  - release
 
+variables:
+  # Cache Gradle dependencies for faster builds
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.caching=true"
+  GRADLE_USER_HOME: "$CI_PROJECT_DIR/.gradle"
+
+# Cache Gradle dependencies between builds
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+# Run tests on every push to main
+test:
+  stage: test
+  image: rockylinux:9
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  before_script:
+    - dnf install -y java-21-openjdk-devel java-21-openjdk
+  script:
+    - './gradlew check'
+  artifacts:
+    when: always
+    reports:
+      junit: 
+        - "app/build/test-results/test/TEST-*.xml"
+    paths:
+      - "app/build/reports/"
+    expire_in: 1 week
+
+# Build fat JAR for any commit on main
 build:
   stage: build
   image: rockylinux:9
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+  needs:
+    - test
+  before_script:
+    - dnf install -y java-21-openjdk-devel java-21-openjdk
   script:
-    # maybe we don't even need to install java?
-    - 'dnf install -y java-21-openjdk-devel java-21-openjdk'
     - './gradlew app:fatJar'
   artifacts:
     paths:
       - './app/build/libs/app.jar'
+    expire_in: 30 days
+
+# Create release artifacts for tagged commits on main
+release:
+  stage: release
+  image: rockylinux:9
+  rules:
+    - if: $CI_COMMIT_TAG && $CI_COMMIT_BRANCH == "main"
+  needs:
+    - test
+  before_script:
+    - dnf install -y java-21-openjdk-devel java-21-openjdk
+  script:
+    - './gradlew app:fatJar'
+    - 'mv ./app/build/libs/app.jar ./app/build/libs/app-${CI_COMMIT_TAG}.jar'
+  artifacts:
+    paths:
+      - './app/build/libs/app-${CI_COMMIT_TAG}.jar'
+  release:
+    tag_name: '$CI_COMMIT_TAG'
+    name: 'Release $CI_COMMIT_TAG'
+    description: 'Release $CI_COMMIT_TAG'
+    assets:
+      links:
+        - name: 'app-${CI_COMMIT_TAG}.jar'
+          url: '${CI_PROJECT_URL}/-/jobs/${CI_JOB_ID}/artifacts/file/app/build/libs/app-${CI_COMMIT_TAG}.jar'
