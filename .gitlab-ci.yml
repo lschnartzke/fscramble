@@ -1,0 +1,13 @@
+stages:
+  - build
+
+build:
+  stage: build
+  image: rockylinux:9
+  script:
+    # maybe we don't even need to install java?
+    - 'dnf install -y java-21-openjdk-devel java-21-openjdk'
+    - './gradlew app:fatJar'
+  artifacts:
+    paths:
+      - './app/build/libs/app.jar'
