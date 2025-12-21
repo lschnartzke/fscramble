@@ -1,5 +1,6 @@
 package de.lschnartzke.fscramble.runner
 
+import de.lschnartzke.fscramble.config.RatioConfig
 import de.lschnartzke.fscramble.config.RunConfig
 
 abstract class AbstractRunner {
@@ -11,6 +12,8 @@ abstract class AbstractRunner {
             }
         }
     }
+
+    var ratios: RatioConfig? = null
 
     abstract fun run()
 }

@@ -23,10 +23,7 @@ object SizeSerializer : KSerializer<Size> {
     override fun deserialize(decoder: Decoder): Size {
         val raw = decoder.decodeString()
         val regex = Regex("([0-9]+)\\s*([GMKTgmkt]?)")
-        val res = regex.find(raw)
-        if (res == null) {
-            return Size(null)
-        }
+        val res = regex.find(raw) ?: return Size(null)
 
         assert (res.groupValues.size == 3)
 
@@ -101,7 +98,18 @@ sealed class RunConfig {
     ) : RunConfig()
 }
 
+/**
+ * Ratio config for a file type.
+ * For now, contains the filetype (i.e. file extension) and ratio (as an integer, to avoid rounding errors)
+ */
+@Serializable
+data class RatioConfig(
+    val type: String,
+    val ratio: Int
+)
+
 @Serializable
 data class Configuration(
-    val run: HashMap<String, RunConfig>
+    val run: HashMap<String, RunConfig>,
+    val ratios: HashMap<String, RatioConfig>
 )
