@@ -31,6 +31,7 @@ dependencies {
     implementation(libs.odftoolkit)
     implementation(libs.klogging)
     implementation(libs.kaml)
+    implementation(libs.kdl)
 }
 
 testing {
