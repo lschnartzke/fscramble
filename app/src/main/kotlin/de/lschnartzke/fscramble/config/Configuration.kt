@@ -1,5 +1,6 @@
 package de.lschnartzke.fscramble.config
 
+import com.github.ajalt.clikt.completion.CompletionCandidates
 import dev.kdl.KdlDocument
 import dev.kdl.KdlNode
 import dev.kdl.KdlNumber
@@ -10,6 +11,7 @@ import dev.kdl.parse.Reporter
 import java.io.File
 import java.math.BigInteger
 import kotlin.io.path.Path
+import kotlin.jvm.optionals.getOrNull
 import kotlin.system.exitProcess
 
 private fun parseScrambleCount(file: String, node: KdlNode): Int {
@@ -113,18 +115,62 @@ class RunStage(
     val files: List<FileConfig>
     ) {
     companion object {
-        fun fromKdlNode(file: String, node: KdlNode): RunStage {
+        fun fromKdlNode(file: String, node: KdlNode, defaultOrder: Int): RunStage {
             assert (node.name == "stage")
 
+            // optional properties
             var gotOrder = false
             var gotCreate = false
             var gotScramble = false
 
+            var order: Int? = null
+            var create = true
+            var scramble = true
+            for (propName in node.properties.propertyNames()) {
+                when (propName) {
+                    "order" -> {
+                        order = node.properties.getValue<KdlNumber.Integer>(propName).getOrNull()?.value()?.asInt()
+                        gotOrder = true
+                    }
+                    "create" -> {
+                        create = node.properties.getValue<Boolean>(propName).getOrNull()?.value() ?: true
+                        gotCreate = true
+                    }
+                    "scramble" -> {
+                        scramble = node.properties.getValue<Boolean>(propName).getOrNull()?.value() ?: true
+                        gotScramble = true
+                    }
+                    else -> throw UnexpectedPropertyName(file, propName, node.name)
+                }
+            }
 
+            var inputDirectory: String? = null
+            var outputDirectory: String? = null
+            var archiveData: String? = null
 
+            for (childNode in node.children) {
+                when (childNode.name) {
+                    "input-directory" -> {
+
+                    }
+
+                    "output-directory" -> {
+
+                    }
+
+                    "archive-data" -> {
+
+                    }
+
+                    "files" -> {
+
+                    }
+                }
+            }
         }
     }
 }
+
 class FileConfig(
     // node name
     val extension: String,
