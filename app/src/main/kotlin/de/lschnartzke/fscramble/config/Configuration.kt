@@ -114,7 +114,7 @@ class RunStage(
     companion object {
         fun fromKdlNode(file: String, node: KdlNode): RunStage {
             assert (node.name == "stage")
-            
+
         }
     }
 }

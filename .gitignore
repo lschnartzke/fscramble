@@ -9,7 +9,7 @@ build
 
 # ignore data files
 data
-config
+/config
 test-input
 test-output
 *.pdf
