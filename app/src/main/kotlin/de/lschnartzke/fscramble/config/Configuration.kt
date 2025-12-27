@@ -87,10 +87,11 @@ class RunConfiguration(
             val stages: MutableList<RunStage> = mutableListOf()
             var scrambleCount: Int = 0
 
+            var currentOrder = 0
             for (childNode in node.children) {
                 when (childNode.name) {
                     "scramble-count" -> scrambleCount = parseScrambleCount(file, childNode)
-                    "stage" ->  stages.add(RunStage.fromKdlNode(file, childNode))
+                    "stage" ->  stages.add(RunStage.fromKdlNode(file, childNode, currentOrder++))
                 }
             }
 
@@ -112,8 +113,14 @@ class RunStage(
     val files: List<FileConfig>
     ) {
     companion object {
-        fun fromKdlNode(file: String, node: KdlNode): RunStage {
+        fun fromKdlNode(file: String, node: KdlNode, order: Int): RunStage {
             assert (node.name == "stage")
+
+            var gotOrder = false
+            var gotCreate = false
+            var gotScramble = false
+
+
             
         }
     }
