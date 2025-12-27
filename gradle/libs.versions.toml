@@ -24,7 +24,7 @@ apache-commons-compress = { group = "org.apache.commons",  name = "commons-compr
 odftoolkit = { group = "org.odftoolkit", name = "odfdom-java", version.ref = "odf"}
 klogging = { group = "io.klogging", name = "klogging-jvm", version.ref = "klogging"}
 kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kaml"}
-kdl = { group = "dev.kdl", name = "kdl4j", version.ref = "kdl4j"}
+kdl = { group = "com.github.kdl-org", name = "kdl4j", version.ref = "kdl4j"}
 
 
 [plugins]
