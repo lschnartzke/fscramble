@@ -113,7 +113,7 @@ class RunStage(
     val files: List<FileConfig>
     ) {
     companion object {
-        fun fromKdlNode(file: String, node: KdlNode, order: Int): RunStage {
+        fun fromKdlNode(file: String, node: KdlNode): RunStage {
             assert (node.name == "stage")
 
             var gotOrder = false
@@ -121,7 +121,7 @@ class RunStage(
             var gotScramble = false
 
 
-            
+
         }
     }
 }
