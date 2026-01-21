@@ -28,8 +28,5 @@ class RunCommand : CliktCommand() {
 
             exitProcess(1)
         }
-
-
-
     }
 }

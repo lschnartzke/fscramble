@@ -60,13 +60,20 @@ public class Library {
             try {
                 // TODO: what do we do with the file object?
                 // TODO: Maybe parallelize?
-                File newFile = (File) scrambler.createNewFile(filename, outpath.toString(), scrambleCount);
+                File newFile = scrambler.createNewFile(filename, outpath.toString(), scrambleCount);
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
+    /**
+     * Scramble all files in the directory.
+     *
+     * @param inputDirectory directory to scramble
+     * @param outputDirectory where to store scrambled files
+     * @param scrambleCount how many scramble actions to perform per file.
+     */
     public void scrambleDirectory(Path inputDirectory, Path outputDirectory, int scrambleCount) {
         if (!inputDirectory.toFile().isDirectory())
             throw new IllegalArgumentException(String.format("'inputDirectory' must be a directory! (path: %s)", inputDirectory));
@@ -76,8 +83,23 @@ public class Library {
 
         // TODO: Currently, this does not recursively
         File[] inputDirectoryFiles = inputDirectory.toFile().listFiles();
-        Arrays.stream(inputDirectoryFiles).forEach((file) -> {
 
+        scrambleFiles(inputDirectoryFiles, outputDirectory, scrambleCount);
+    }
+
+    /**
+     * Scramble the provided list of files.
+     * @param files list of files to scramble
+     * @param outputDirectory Where to store scrambled files
+     * @param scrambleCount how many scramble actions to perform per file
+     */
+    public void scrambleFiles(File[] files, Path outputDirectory, int scrambleCount) {
+        if (!outputDirectory.toFile().isDirectory())
+            throw new IllegalArgumentException(String.format("'outputDirectory' must be a directory! (path: %s)", outputDirectory));
+
+        // TODO: Parallelize
+
+        Arrays.stream(files).forEach((file) -> {
             String extension = file.getName().substring(file.getName().lastIndexOf('.') + 1);
             AbstractScrambler scrambler = AbstractScrambler.Companion.getScramblerExtensionMap().get(extension);
             if (Objects.isNull(scrambler))
@@ -89,24 +111,5 @@ public class Library {
                 // TODO: Log error
             }
         });
-
-    }
-
-    public void scrambleFiles(Path[] files, Path outputDirectory, int scrambleCount) {
-        if (!outputDirectory.toFile().isDirectory())
-            throw new IllegalArgumentException(String.format("'outputDirectory' must be a directory! (path: %s)", outputDirectory));
-
-        // TODO: Parallelize
-        for (Path file : files) {
-            String filename = file.getFileName().toString();
-            String extension = filename.substring(filename.lastIndexOf('.') + 1);
-            AbstractScrambler scrambler = AbstractScrambler.Companion.getScramblerExtensionMap().get(extension);
-
-            try {
-                scrambler.scramble(file.toString(), outputDirectory.toString(), scrambleCount);
-            } catch (Exception e) {
-                // TODO: Logging?
-            }
-        }
     }
 }
