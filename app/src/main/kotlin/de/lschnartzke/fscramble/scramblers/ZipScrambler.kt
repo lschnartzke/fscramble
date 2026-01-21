@@ -11,7 +11,7 @@ class ZipScrambler : AbstractArchiveScrambler() {
     /**
      * Create a new archive and add some (also randomly created) files to it:
      */
-    override suspend fun createNewArchive(
+    override  fun createNewArchive(
         filename: String,
         outputDirectory: File,
         workingDirectory: File,
@@ -30,7 +30,7 @@ class ZipScrambler : AbstractArchiveScrambler() {
      * Perform the scramble actions on the provided input file, writing the result to the output.
      * `output` is expected to be a new file, containing nothing (perhaps not even existing on disk yet).
      */
-    private suspend fun doScramble(input: ZipFile?, output: ZipArchiveOutputStream, inputDirectory: File, scrambleCount: Int) {
+    private  fun doScramble(input: ZipFile?, output: ZipArchiveOutputStream, inputDirectory: File, scrambleCount: Int) {
         if (!inputDirectory.isDirectory)
             throw IllegalArgumentException("input directory is not a directory")
         val inputFiles = inputDirectory.listFiles().toMutableList()
@@ -91,7 +91,7 @@ class ZipScrambler : AbstractArchiveScrambler() {
     /**
      * Randomly remove and add (some) files to the archive
      */
-    override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
+    override  fun scramble(input: String, output: String, scrambleCount: Int) {
         val ifile  = File(input)
         val ofile = getOutfile(input, output)
         val workingDirectory = ifile.parentFile

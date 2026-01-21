@@ -18,7 +18,7 @@ abstract class AbstractArchiveScrambler : AbstractScrambler() {
         val supportedArchives: List<String> = archiveScramblerExtensionMap.keys.toList()
     }
 
-    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+    override fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
         throw IllegalCallerException("when using archive scramblers, createNewArchive(...) must be called instead of createNewFile(...)")
     }
 
@@ -31,6 +31,6 @@ abstract class AbstractArchiveScrambler : AbstractScrambler() {
      * @param workingDirectory the directory containing files that can be put in the archive
      * @param scrambleCount how many scramble actions to perform on the file. Will randomly add files, but not remove any.
      */
-    abstract suspend fun createNewArchive(filename: String, outputDirectory: File, workingDirectory: File,  scrambleCount: Int): File
+    abstract fun createNewArchive(filename: String, outputDirectory: File, workingDirectory: File,  scrambleCount: Int): File
 
 }

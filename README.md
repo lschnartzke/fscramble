@@ -131,3 +131,17 @@ Note that, in the configuration format, `size` can be used with units to simplif
 
 
 ## Configuration files
+
+
+# Python API
+* Init Methode: Lädt dataDirectory
+* Create multiple files
+  * Dateityp
+  * File count
+  * Output-Pfad
+  * Scramble count
+* Scramble directory / Individual file (separate methods)
+  * Path to Directory / Array of files to scramble
+  * Output directory
+  * Scramble count 
+* Destroy 

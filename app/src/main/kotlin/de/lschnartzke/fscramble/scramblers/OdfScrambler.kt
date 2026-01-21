@@ -2,6 +2,7 @@ package de.lschnartzke.fscramble.scramblers
 
 import de.lschnartzke.fscramble.cache.DataCache
 import io.klogging.logger
+import kotlinx.coroutines.runBlocking
 import org.odftoolkit.odfdom.doc.OdfTextDocument
 import org.odftoolkit.odfdom.dom.element.office.OfficeTextElement
 import org.odftoolkit.odfdom.dom.element.text.TextPElement
@@ -12,7 +13,7 @@ import java.io.File
 class OdfScrambler() : AbstractScrambler() {
     private val logger = logger<OdfScrambler>()
 
-    override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
+    override fun scramble(input: String, output: String, scrambleCount: Int) {
         val ifile = File(input)
         val outfile = getOutfile(input, output)
         when (ifile.extension) {
@@ -20,7 +21,7 @@ class OdfScrambler() : AbstractScrambler() {
         }
     }
 
-    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+    override fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
         val outfile = getOutfile(filename, outpath)
         val doc = OdfTextDocument.newTextDocument()
 
@@ -30,7 +31,7 @@ class OdfScrambler() : AbstractScrambler() {
         return outfile
     }
 
-    private suspend fun scrambleTextDocument(input: File, output: File, scrambleCount: Int) {
+    private fun scrambleTextDocument(input: File, output: File, scrambleCount: Int) {
         val document = OdfTextDocument.loadDocument(input)
 
         doScramble(scrambleCount, document)
@@ -38,10 +39,10 @@ class OdfScrambler() : AbstractScrambler() {
         document.save(output)
     }
 
-    private suspend fun doScramble(scrambleCount: Int, document: OdfTextDocument) {
+    private fun doScramble(scrambleCount: Int, document: OdfTextDocument) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.debug("action" to action.toString())
+            runBlocking { logger.debug("action" to action.toString()) }
             when (action) {
                 ScrambleAction.ADD_TEXT -> scrambleAddText(document)
                 ScrambleAction.REMOVE_TEXT -> scrambleRemoveText(document)
@@ -63,20 +64,20 @@ class OdfScrambler() : AbstractScrambler() {
     /**
      * Insert new text at a random place in the document
      */
-    private suspend fun scrambleAddText(doc: OdfTextDocument) {
+    private fun scrambleAddText(doc: OdfTextDocument) {
         doc.newParagraph(DataCache.getDataCache().getRandomParagraph())
     }
 
     /**
      * Remove random text from the document
      */
-    private suspend fun scrambleRemoveText(doc: OdfTextDocument) {
+    private fun scrambleRemoveText(doc: OdfTextDocument) {
         val node = getRandomNode(doc.contentRoot)
         try {
             node.removeContent()
             doc.contentRoot.removeChild(node)
         } catch (e: Exception) {
-            logger.error("Failed to remove text element", "error" to e)
+            runBlocking { logger.error("Failed to remove text element", "error" to e) }
         }
     }
 

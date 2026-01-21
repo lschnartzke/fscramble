@@ -8,7 +8,7 @@ import java.io.File
 import kotlin.io.path.absolute
 
 class ArchiveScrambler : AbstractArchiveScrambler() {
-    override suspend fun createNewArchive(
+    override  fun createNewArchive(
         filename: String,
         outputDirectory: File,
         workingDirectory: File,
@@ -86,7 +86,7 @@ class ArchiveScrambler : AbstractArchiveScrambler() {
         }
     }
 
-    override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
+    override  fun scramble(input: String, output: String, scrambleCount: Int) {
         val ifile = File(input)
         val ofile = getOutfile(input, output)
         val workingDirectory = ifile.parentFile

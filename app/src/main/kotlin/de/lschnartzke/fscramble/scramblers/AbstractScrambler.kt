@@ -90,7 +90,7 @@ abstract class AbstractScrambler() {
      * @param outpath The directory in which to store the resulting file.
      * @param scrambleCount How many actions to perform on the new file.
      */
-    abstract suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int = 50): File
+    abstract fun createNewFile(filename: String, outpath: String, scrambleCount: Int = 50): File
 
     protected fun getOutfile(input: String, output: String): File {
         val ofile = File(output)
@@ -110,7 +110,7 @@ abstract class AbstractScrambler() {
      * @param output - Where to save the scrambled file. Can be a filename or existing directory.
      *                 If output points to a directory, the resulting file will be at output/input.pdf
      */
-    abstract suspend fun scramble(input: String, output: String, scrambleCount: Int)
+    abstract fun scramble(input: String, output: String, scrambleCount: Int)
 
     /**
      * Returns a random action that shall be performed on the open file. The exact action performed will depend on

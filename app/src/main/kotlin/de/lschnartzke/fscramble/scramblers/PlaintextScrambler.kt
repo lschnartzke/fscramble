@@ -2,12 +2,13 @@ package de.lschnartzke.fscramble.scramblers
 
 import de.lschnartzke.fscramble.cache.DataCache
 import io.klogging.logger
+import kotlinx.coroutines.runBlocking
 import java.io.File
 
 class PlaintextScrambler : AbstractScrambler() {
     private val logger = logger<PlaintextScrambler>()
 
-    override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
+    override  fun scramble(input: String, output: String, scrambleCount: Int) {
         val outfile = getOutfile(input, output)
         val fileLines = File(input).readLines().toMutableList()
 
@@ -21,10 +22,10 @@ class PlaintextScrambler : AbstractScrambler() {
         ostream.close()
     }
 
-    private suspend fun doScramble(scrambleCount: Int, fileLines: MutableList<String>) {
+    private  fun doScramble(scrambleCount: Int, fileLines: MutableList<String>) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.debug("action" to action.toString())
+            runBlocking { logger.debug("action" to action.toString()) }
             when (action) {
                 ScrambleAction.ADD_TEXT, ScrambleAction.ADD_MEDIA -> scrambleAddText(fileLines)
                 ScrambleAction.REMOVE_TEXT, ScrambleAction.REMOVE_MEDIA -> scrambleRemoveText(fileLines)
@@ -33,7 +34,7 @@ class PlaintextScrambler : AbstractScrambler() {
     }
 
 
-    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+    override  fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
         val outfile = getOutfile(filename, outpath)
 
         val lines = mutableListOf<String>()
@@ -47,7 +48,7 @@ class PlaintextScrambler : AbstractScrambler() {
         return outfile
     }
 
-    private suspend fun scrambleAddText(lines: MutableList<String>) {
+    private  fun scrambleAddText(lines: MutableList<String>) {
         val line = DataCache.getDataCache().getRandomParagraph()
         if (lines.isEmpty()) {
             lines.add(line)
@@ -56,7 +57,7 @@ class PlaintextScrambler : AbstractScrambler() {
         }
     }
 
-    private suspend fun scrambleRemoveText(lines: MutableList<String>) {
+    private  fun scrambleRemoveText(lines: MutableList<String>) {
         if (lines.isNotEmpty())
             lines.removeAt(rng.nextInt(until = lines.size))
     }

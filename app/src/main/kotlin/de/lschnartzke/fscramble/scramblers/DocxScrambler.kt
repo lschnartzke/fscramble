@@ -2,6 +2,7 @@ package de.lschnartzke.fscramble.scramblers
 
 import de.lschnartzke.fscramble.cache.DataCache
 import io.klogging.logger
+import kotlinx.coroutines.runBlocking
 import org.apache.poi.util.Units
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import java.io.File
@@ -9,7 +10,7 @@ import java.io.File
 class DocxScrambler : AbstractScrambler() {
     private val logger = logger<DocxScrambler>()
 
-    override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
+    override fun scramble(input: String, output: String, scrambleCount: Int) {
         val outfile = getOutfile(input, output)
         val istream = File(input).inputStream().buffered()
         val doc = XWPFDocument(istream)
@@ -20,7 +21,7 @@ class DocxScrambler : AbstractScrambler() {
         doc.close()
     }
 
-    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+    override fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
         val outfile = getOutfile(filename, outpath)
         val doc = XWPFDocument()
 
@@ -30,10 +31,10 @@ class DocxScrambler : AbstractScrambler() {
         return outfile
     }
 
-    private suspend fun doScramble(scrambleCount: Int, doc: XWPFDocument) {
+    private fun doScramble(scrambleCount: Int, doc: XWPFDocument) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.debug("action" to action.toString())
+            runBlocking { logger.debug("action" to action.toString()) }
 
             when (action) {
                 ScrambleAction.ADD_TEXT -> scrambleAddText(doc)
@@ -44,7 +45,7 @@ class DocxScrambler : AbstractScrambler() {
         }
     }
 
-    private suspend fun scrambleAddText(doc: XWPFDocument) {
+    private fun scrambleAddText(doc: XWPFDocument) {
         val text = DataCache.getDataCache().getRandomParagraph()
         val paragraph = doc.createParagraph()
         paragraph.createRun().apply {
@@ -53,11 +54,11 @@ class DocxScrambler : AbstractScrambler() {
         }
     }
 
-    private suspend fun scrambleRemoveText(doc: XWPFDocument) {
+    private fun scrambleRemoveText(doc: XWPFDocument) {
         // TODO: How?
     }
 
-    private suspend fun scrambleAddMedia(doc: XWPFDocument) {
+    private fun scrambleAddMedia(doc: XWPFDocument) {
         val data = DataCache.getDataCache().getRandomImageData() ?: return
         val paragraph = doc.createParagraph()
         val run = paragraph.createRun()
@@ -67,7 +68,7 @@ class DocxScrambler : AbstractScrambler() {
         run.addBreak()
     }
 
-    private suspend fun scrambleRemoveMedia(doc: XWPFDocument) {
+    private fun scrambleRemoveMedia(doc: XWPFDocument) {
         try {
             if (doc.allPictures.isNotEmpty()) {
                 doc.allPictures.removeAt(rng.nextInt(until = doc.allPictures.size))
@@ -77,7 +78,8 @@ class DocxScrambler : AbstractScrambler() {
                 return
             }
         } catch (e: Exception) {
-            logger.error("Failed to remove media", "error" to e)
+            // TODO: Switch to different logging library. Logging is the only reason we've used suspend and that's not worth it
+            runBlocking { logger.error("Failed to remove media", "error" to e)  }
         }
     }
 }

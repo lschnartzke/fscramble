@@ -1,25 +1,20 @@
 package de.lschnartzke.fscramble.scramblers
 
-import com.itextpdf.io.font.FontNames
-import com.itextpdf.io.image.ImageData
 import com.itextpdf.io.image.ImageDataFactory
-import com.itextpdf.kernel.font.PdfFont
-import com.itextpdf.kernel.font.PdfFontFactory
-import com.itextpdf.kernel.font.PdfTrueTypeFont
-import com.itextpdf.kernel.geom.Rectangle
-import com.itextpdf.kernel.pdf.*
-import com.itextpdf.layout.Document
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfPage
+import com.itextpdf.kernel.pdf.PdfReader
+import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.kernel.pdf.canvas.PdfCanvas
 import com.itextpdf.layout.Canvas
+import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Image
-import com.itextpdf.layout.element.Paragraph
 import de.lschnartzke.fscramble.cache.DataCache
 import io.klogging.logger
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.io.FileInputStream
-import kotlin.math.absoluteValue
 
 /**
  * Class responsible for scrambling PDF files.
@@ -46,7 +41,7 @@ class PdfScrambler() : AbstractScrambler() {
         return writer
     }
 
-    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+    override fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
         val outfile = getOutfile(filename, outpath)
         val writer = PdfWriter(outfile)
         val doc = Document(PdfDocument(writer))
@@ -57,7 +52,7 @@ class PdfScrambler() : AbstractScrambler() {
         return outfile
     }
 
-    override suspend fun scramble(input: String, output: String, scrambleCount: Int) = withContext(Dispatchers.IO) {
+    override fun scramble(input: String, output: String, scrambleCount: Int) {
         val reader = PdfReader(input)
         val writer = pdfWriter(input, output)
 
@@ -68,10 +63,10 @@ class PdfScrambler() : AbstractScrambler() {
         pdfDoc.close()
     }
 
-    private suspend fun doScramble(scrambleCount: Int, pdfDoc: Document) {
+    private fun doScramble(scrambleCount: Int, pdfDoc: Document) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.debug("action" to action.toString())
+            runBlocking { logger.debug("action" to action.toString()) }
             try {
                 when (action) {
                     ScrambleAction.ADD_TEXT -> scrambleAddText(pdfDoc)
@@ -80,7 +75,7 @@ class PdfScrambler() : AbstractScrambler() {
                     ScrambleAction.REMOVE_MEDIA -> scrambleRemoveMedia(pdfDoc)
                 }
             } catch (e: Exception) {
-                logger.error(mapOf("action" to action.toString(), "error" to e))
+                runBlocking { logger.error(mapOf("action" to action.toString(), "error" to e)) }
             }
         }
     }

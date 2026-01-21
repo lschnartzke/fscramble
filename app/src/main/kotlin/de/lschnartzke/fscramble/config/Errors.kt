@@ -26,3 +26,15 @@ class UnexpectedChildCount(file: String, val nodeName: String, val expected: Int
 
 class IllegalArgumentType(file: String, val nodeName: String, val expected: String, val got: String)
     : ConfigException(file,  "Illegal argument type on node '$nodeName': Expected type '$expected', got '$got' instead.")
+
+class ArgumentRequired(file: String, val nodeName: String, val count: Int = 1)
+    : ConfigException(file, "Node '$nodeName requires (at least) $count arguments")
+
+class PropertyValueExpected(file: String, val nodeName: String, val propName: String)
+    : ConfigException(file, "Expected value for property '$propName' on node '$nodeName")
+
+class IllegalPropertyValueType(file: String, val nodeName: String, val propName: String,  val expected: String, val got: String)
+    : ConfigException(file, "Expected property '$propName' to have a value of type '$expected', got '$got' instead (on node '$nodeName')")
+
+class MutuallyExclusiveProperties(file: String, val nodeName: String, val prop1: String, val prop2: String)
+    : ConfigException(file, "'$prop1' and '$prop2' on node '$nodeName' are mutually exclusive. Remove (at least) one.")
