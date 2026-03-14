@@ -11,7 +11,7 @@ class TarScrambler : AbstractArchiveScrambler() {
     /**
      * Create a new archive and randomly add files to it.
      */
-    override suspend fun createNewArchive(
+    override fun createNewArchive(
         filename: String,
         outputDirectory: File,
         workingDirectory: File,
@@ -26,7 +26,7 @@ class TarScrambler : AbstractArchiveScrambler() {
         return file
     }
 
-    private suspend fun doScramble(input: TarFile?, output: TarArchiveOutputStream, inputDirectory: File, scrambleCount: Int) {
+    private fun doScramble(input: TarFile?, output: TarArchiveOutputStream, inputDirectory: File, scrambleCount: Int) {
         if (!inputDirectory.isDirectory)
             throw IllegalArgumentException("input directory must be a directory")
 
@@ -59,7 +59,7 @@ class TarScrambler : AbstractArchiveScrambler() {
     /**
      * Randomly add and remove (some) files from the archive.
      */
-    override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
+    override fun scramble(input: String, output: String, scrambleCount: Int) {
         val ifile = File(input)
         val ofile = getOutfile(input, output)
         val workingDirectory = ifile.parentFile

@@ -11,7 +11,7 @@ import java.io.File
 class XlsxScrambler : AbstractScrambler() {
     private val logger = logger<XlsxScrambler>()
 
-    override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
+    override  fun scramble(input: String, output: String, scrambleCount: Int) {
         val outfile = getOutfile(input, output)
         val doc = XSSFWorkbook(input)
 
@@ -21,10 +21,10 @@ class XlsxScrambler : AbstractScrambler() {
         doc.close()
     }
 
-    private suspend fun doScramble(scrambleCount: Int, doc: XSSFWorkbook) {
+    private  fun doScramble(scrambleCount: Int, doc: XSSFWorkbook) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.debug("action" to action.toString())
+            runBlocking { logger.debug("action" to action.toString()) }
             when (action) {
                 ScrambleAction.ADD_TEXT -> scrambleAddText(doc)
                 ScrambleAction.REMOVE_TEXT -> scrambleRemoveText(doc)
@@ -34,7 +34,7 @@ class XlsxScrambler : AbstractScrambler() {
         }
     }
 
-    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+    override  fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
         val outfile = getOutfile(filename, outpath)
         val doc = XSSFWorkbook()
 
@@ -71,20 +71,20 @@ class XlsxScrambler : AbstractScrambler() {
             null
         }
 
-    private suspend fun scrambleAddText(doc: XSSFWorkbook) {
+    private  fun scrambleAddText(doc: XSSFWorkbook) {
         // SAFETY: unless create == false this will never be null
         val sheet = getOrCreateRandomSheet(doc)!!
         val cell = getRandomCellFromSheet(sheet)
         cell.setCellValue(DataCache.getDataCache().getRandomParagraph())
     }
 
-    private suspend fun scrambleRemoveText(doc: XSSFWorkbook) {
+    private  fun scrambleRemoveText(doc: XSSFWorkbook) {
         val sheet = getOrCreateRandomSheet(doc, create = false) ?: return
         val cell = getRandomCellFromSheet(sheet)
         cell.setBlank()
     }
 
-    private suspend fun scrambleAddMedia(doc: XSSFWorkbook) {
+    private  fun scrambleAddMedia(doc: XSSFWorkbook) {
         val imageData = DataCache.getDataCache().getRandomImageData() ?: return
         // Safety: Unless create == false this cannot be null
         val sheet = getOrCreateRandomSheet(doc)!!
@@ -93,14 +93,14 @@ class XlsxScrambler : AbstractScrambler() {
         val pictureData = doc.allPictures[pictureIndex]
     }
 
-    private suspend fun scrambleRemoveMedia(doc: XSSFWorkbook) {
+    private  fun scrambleRemoveMedia(doc: XSSFWorkbook) {
         if (doc.allPictures.isEmpty())
             return
 
         val pictureIndex = rng.nextInt(until = doc.allPictures.size)
         val pictureData = doc.allPictures[pictureIndex]
         val picturePart = pictureData.packagePart
-        logger.info("picturePartName" to picturePart.partName)
+        runBlocking { logger.info("picturePartName" to picturePart.partName) }
         doc.`package`.removePart(pictureData.packagePart)
         doc.allPictures.removeAt(pictureIndex)
 

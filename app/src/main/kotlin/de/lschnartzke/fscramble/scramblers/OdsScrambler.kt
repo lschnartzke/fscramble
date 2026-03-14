@@ -2,6 +2,7 @@ package de.lschnartzke.fscramble.scramblers
 
 import de.lschnartzke.fscramble.cache.DataCache
 import io.klogging.logger
+import kotlinx.coroutines.runBlocking
 import org.odftoolkit.odfdom.doc.OdfDocument
 import org.odftoolkit.odfdom.doc.OdfSpreadsheetDocument
 import org.odftoolkit.odfdom.doc.table.OdfTableCell
@@ -10,7 +11,7 @@ import java.io.File
 class OdsScrambler : AbstractScrambler() {
     private val logger = logger<OdsScrambler>()
 
-    override suspend fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
+    override  fun createNewFile(filename: String, outpath: String, scrambleCount: Int): File {
         val outfile = getOutfile(filename, outpath)
         val doc = OdfSpreadsheetDocument.newSpreadsheetDocument()
 
@@ -20,7 +21,7 @@ class OdsScrambler : AbstractScrambler() {
         return outfile
     }
 
-    override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
+    override  fun scramble(input: String, output: String, scrambleCount: Int) {
         val outfile = getOutfile(input, output)
         val doc = OdfSpreadsheetDocument.loadDocument(input)
 
@@ -29,10 +30,10 @@ class OdsScrambler : AbstractScrambler() {
         doc.save(outfile)
     }
 
-    private suspend fun doScramble(scrambleCount: Int, doc: OdfSpreadsheetDocument) {
+    private  fun doScramble(scrambleCount: Int, doc: OdfSpreadsheetDocument) {
         repeat(scrambleCount) {
             val action = getScrambleAction()
-            logger.debug("action" to action.toString())
+            runBlocking { logger.debug("action" to action.toString()) }
             when (action) {
                 ScrambleAction.ADD_TEXT -> scrambleAddText(doc)
                 ScrambleAction.REMOVE_TEXT -> scrambleRemoveText(doc)
@@ -42,7 +43,7 @@ class OdsScrambler : AbstractScrambler() {
         }
     }
 
-    private suspend fun getRandomCell(doc: OdfSpreadsheetDocument): OdfTableCell? {
+    private  fun getRandomCell(doc: OdfSpreadsheetDocument): OdfTableCell? {
         val table = doc.getTableList(true)[0] ?: return null
         val columns = table.columnList
         if (columns.isEmpty())
@@ -54,18 +55,18 @@ class OdsScrambler : AbstractScrambler() {
         return row.getCellByIndex(rng.nextInt(until = row.cellCount))
     }
 
-    private suspend fun scrambleAddText(doc: OdfSpreadsheetDocument) {
+    private  fun scrambleAddText(doc: OdfSpreadsheetDocument) {
         val cell = getRandomCell(doc) ?: return
 
         cell.displayText = DataCache.getDataCache().getRandomParagraph()
     }
 
-    private suspend fun scrambleRemoveText(doc: OdfSpreadsheetDocument) {
+    private  fun scrambleRemoveText(doc: OdfSpreadsheetDocument) {
         val cell = getRandomCell(doc) ?: return
         cell.displayText = ""
     }
 
-    private suspend fun scrambleAddMedia(doc: OdfSpreadsheetDocument) {
+    private  fun scrambleAddMedia(doc: OdfSpreadsheetDocument) {
         val imageData = DataCache.getDataCache().getRandomImageData() ?: return
         val cell = getRandomCell(doc) ?: return
         val mediaUri = doc.newImage(imageData.file.toURI())
@@ -73,7 +74,7 @@ class OdsScrambler : AbstractScrambler() {
         cell.stringValue = mediaUri
     }
 
-    private suspend fun scrambleRemoveMedia(doc: OdfSpreadsheetDocument) {
+    private  fun scrambleRemoveMedia(doc: OdfSpreadsheetDocument) {
         // TODO: How?
     }
 }

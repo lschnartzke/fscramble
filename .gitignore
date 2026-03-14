@@ -2,13 +2,15 @@
 .gradle
 .idea
 .kotlin
+**/.idea/workspace.xml
+**/.idea/tasks.xml
 
 # Ignore Gradle build output directory
 build
 
 # ignore data files
 data
-config
+/config
 test-input
 test-output
 *.pdf

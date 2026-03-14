@@ -8,7 +8,7 @@ import java.io.File
 import kotlin.io.path.absolute
 
 class ArchiveScrambler : AbstractArchiveScrambler() {
-    override suspend fun createNewArchive(
+    override  fun createNewArchive(
         filename: String,
         outputDirectory: File,
         workingDirectory: File,
@@ -68,10 +68,8 @@ class ArchiveScrambler : AbstractArchiveScrambler() {
                     ScrambleAction.ADD_MEDIA -> {
                         if (archiveEntries.isNotEmpty()) {
                             val entry = archiveEntries.random()
-                            // This might cause issues if we're copying from a directory, as we've likely not created the parent directories yet.
-                            // But is this actually an issue?
                             archive.putArchiveEntry(entry)
-                            if (!entry.isDirectory) {
+                            if (entry.isDirectory) {
                                 archive.getInputStream(entry).use {
                                     // this will probably crash if we're reading files (a lot) bigger than available memory
                                     // swap, so for safety reasons copying files that would crash this implementation are hereby
@@ -88,7 +86,7 @@ class ArchiveScrambler : AbstractArchiveScrambler() {
         }
     }
 
-    override suspend fun scramble(input: String, output: String, scrambleCount: Int) {
+    override  fun scramble(input: String, output: String, scrambleCount: Int) {
         val ifile = File(input)
         val ofile = getOutfile(input, output)
         val workingDirectory = ifile.parentFile

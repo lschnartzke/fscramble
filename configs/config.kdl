@@ -1,0 +1,29 @@
+runs {
+    run-config name="default" {
+        scramble-count 20
+        stage order=1 create=true scramble=true {
+            input-directory "input-data"
+            output-directory "output-stage-1"
+            archive-data "archive-data"
+            files {
+                pdf count=20
+                docx
+                odt
+                xlsx
+                zip
+                tar
+            }
+        }
+
+        stage order=2 create=false scramble=true {
+            input-directory "input-data"
+            output-directory "output-stage-2"
+            archive-data "archive-data"
+            files {
+                pdf ratio=0.7
+                docx ratio=0.2
+                odt ratio=0.1
+            }
+        }
+    }
+}

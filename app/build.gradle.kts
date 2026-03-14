@@ -18,6 +18,7 @@ plugins {
 repositories {
     // Use Maven Central for resolving dependencies.
     mavenCentral()
+    maven { url = uri("https://jitpack.io") }
 }
 
 dependencies {
@@ -31,6 +32,7 @@ dependencies {
     implementation(libs.odftoolkit)
     implementation(libs.klogging)
     implementation(libs.kaml)
+    implementation(libs.kdl)
 }
 
 testing {
