@@ -1,3 +1,6 @@
+> [!WARNING]
+> This README hasn't been updated in a while and is unbelievably out of date. Do not rely on anything you read except maybe the the first two sections. Anything covering 'how-to-use' is most likely false.
+
 # `fscramble` - File Scrambler
 `fscramble` is a *simple* tool that takes a directory of files and randomly scrambles their contents, writing the
 result to a different directory. Its main purpose is to be used to rapidly simulate change in data over a long(er)
@@ -152,20 +155,3 @@ Note that, in the configuration format, `size` can be used with units to simplif
   * The numeric value *must* be an integer.
   * The numeric value is multiplied with `1024`.
 
-
-
-## Configuration files
-
-
-# Python API
-* Init Methode: Lädt dataDirectory
-* Create multiple files
-  * Dateityp
-  * File count
-  * Output-Pfad
-  * Scramble count
-* Scramble directory / Individual file (separate methods)
-  * Path to Directory / Array of files to scramble
-  * Output directory
-  * Scramble count 
-* Destroy 
