@@ -21,5 +21,7 @@ jobs:
         run: ./gradlew app:fatJar
       - name: Create release
         uses: softprops/action-gh-release@v2
+        permissions:
+          contents: write
         with:
           files: app/build/libs/app.jar
